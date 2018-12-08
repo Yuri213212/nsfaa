@@ -1,0 +1,1 @@
+i686-pc-mingw32-gcc -Wall -O3 -s -o txt2bin.exe txt2bin.c -mwindows

@@ -1,0 +1,312 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1		;set whether to output nsf header, 0 for data module (def=1)
+\setoptail	0		;set whether to output dummy data to make link possible (def=0)
+\setdefnumlen	1		;set default length for number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1		;total songs (def=1)
+\entry		1		;default song number (1 for first) (def=1)
+\name				;the next line is the string of name (def=nil)
+
+\artist				;the next line is the string of artist (def=nil)
+
+\copyright			;the next line is the string of (c) (def=nil)
+
+\ntsc		16666		;frequency divider from 1000000Hz to call _PLAY_ for NTSC (def=16666)	;useless in VirtuaNES
+\pal		20000		;frequency divider from 1000000Hz to call _PLAY_ for PAL (def=20000)	;useless in VirtuaNES
+\ntscpal	0		;NTSC/PAL mode, 0 for NTSC, 1 for PAL, 2 for both (def=0)
+\expand		0x12		;flag list for expansion chip (def=0x12)
+					;01 for VRC6
+					;02 for VRC7
+					;04 for FDS
+					;08 for MMC5
+					;10 for N163
+					;20 for FME7
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+				;initial bank switch data, all 0 for unused (def=0x00*8)
+
+;;;;;;;;;;;;;;;;
+;	[system]
+;;;;;;;;;;;;;;;;
+	;bank switch
+	@5FF6
+1:BANK6
+1:BANK7
+1:BANK8
+1:BANK9
+1:BANKA
+1:BANKB
+1:BANKC
+1:BANKD
+1:BANKE
+1:BANKF
+	;multiplier in MMC5
+	@5205
+1:MULLO		;store data to MULLO and MULHI then read the product
+1:MULHI
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[2A03]	;channel=rec1,rec2,tri,noise,dpcm
+	;general
+	@4015
+:ST2A03		;-,-,-,dpcm,noise,tri,rec2,rec1 enable
+	@4017
+:IRQ2A03	;framemode,IRQ,-,-,-,-,-,-
+	;rec1
+	@4000
+1:REC1VOL	;duty(2),lenhlt,~env,vol/envPeriod(4)
+1:REC1SWP	;sweep,period(3),negate,shift(3)
+1:REC1LOPERIOD	;loPeriod(8)
+1:REC1HIPERIOD	;length(5),hiPeriod(3)
+	;rec2
+1:REC2VOL
+1:REC2SWP
+1:REC2LOPERIOD
+1:REC2HIPERIOD
+	;tri
+2:TRILINC	;lenhlt,linarcount(7)
+1:TRILOPERIOD	;loPeriod(8)
+1:TRIHIPERIOD	;length(5),hiPeriod(3)
+	;noise
+2:NOISEVOL	;-,-,lenhlt,1,vol(4)
+1:NOISEPERIOD	;short,-,-,-,period(4)
+1:NOISELEN	;length(5),-,-,-
+	;dpcm
+1:DPCMMODE	;IRQ,loop,-,-,freq(4)
+1:DPCMDATA	;-,data(7)
+1:DPCMWAVE	;addr(8)
+1:DPCMLEN	;length(8)
+
+;;;;	[VRC6]	;channel=rec3,rec4,saw
+	;general
+	@9003
+:STVRC6		;0 for normal, 2 for 16x freq, 4 for 256x freq, 1 for 0x freq	;useless in VirtuaNES
+	;rec3
+	@9000
+1:REC3VOL	;pullHigh,duty(3),vol(4)
+1:REC3LOPERIOD	;loPeriod(8)
+1:REC3HIPERIOD	;enable,-,-,-,hiPeriod(4)
+	;rec4
+	@A000
+1:REC4VOL
+1:REC4LOPERIOD
+1:REC4HIPERIOD
+	;saw
+	@B000
+1:SAWVOL	;-,-,vol(6)
+1:SAWLOPERIOD
+1:SAWHIPERIOD
+
+;;;;	[VRC7]	;channel=fm1,fm2,fm3,fm4,fm5,fm6(,fm7,fm8,fm9)
+	;VRC7 address port
+	@9010
+:VA		;addr(8)
+	;VRC7 data port
+	@9030
+:VD		;dataW(8)
+	;inner
+	@00
+8:FMINS		;8 byte data to define instrument 0
+			;00 AM,vib,sust,krs,freqmul(4) mod
+			;01 AM,vib,sust,krs,freqmul(4) main
+			;02 kls(2),ModLv(6) mod
+			;03 kls(2),-,wavmain,wavmod,feedback(3)
+			;04 A(4),D(4) mod
+			;05 A(4),D(4) main
+			;06 S(4),R(4) mod
+			;07 S(4),R(4) main
+	@0E
+1:FMPERC		;-,-,mode,bass,snare,tom,cymbal,hihat	;hidden function in VirtuaNES
+	@10
+1:FM1FREQ	;loFreq(8)
+1:FM2FREQ
+1:FM3FREQ
+1:FM4FREQ
+1:FM5FREQ
+1:FM6FREQ
+1:FM7FREQ		;hidden function in VirtuaNES
+1:FM8FREQ		;hidden function in VirtuaNES
+1:FM9FREQ		;hidden function in VirtuaNES
+	@20
+1:FM1OCT	;-,-,sust,enable,oct(3),hiFreq
+1:FM2OCT
+1:FM3OCT
+1:FM4OCT
+1:FM5OCT
+1:FM6OCT
+1:FM7OCT		;hidden function in VirtuaNES
+1:FM8OCT		;hidden function in VirtuaNES
+1:FM9OCT		;hidden function in VirtuaNES
+	@30
+1:FM1VOL	;inst(4),vol(4)
+1:FM2VOL
+1:FM3VOL
+1:FM4VOL
+1:FM5VOL
+1:FM6VOL
+1:FM7VOL	;-,-,-,-,bassvol(4)		;hidden function in VirtuaNES
+1:FM8VOL	;hihatvol(4),snarevol(4)	;hidden function in VirtuaNES
+1:FM9VOL	;tomvol(4),cymbalvol(4)		;hidden function in VirtuaNES
+
+;;;;	[FDS]	;channel=w64
+	;general
+	@4023
+1:STFDS		;-,-,-,-,-,-,sound,disk	;useless in VirtuaNES
+	;w64
+	@4040
+64:W64MAINWAVE	;64 byte data for wave table in -,-,~data(6)
+2:W64MAINVOL	;~env,envdirection,vol(6)/envspeed(6)	;max vol=0x20
+1:W64MAINLOFREQ	;loFreq(8)
+1:W64MAINHIFREQ	;disable,~env,-,-,hiFreq(4)
+1:W64MODVOL	;~env,envdirection,vol(6)/envspeed(6)
+1:W64MODPHASE	;-,modPhase(7)
+1:W64MODLOFREQ	;loFreq(8)
+1:W64MODHIFREQ	;disable,-,-,-,hiFreq(4)
+1:W64MODTABLE	;-,-,-,-,-,data(3)	;store 32 times to update
+1:W64MASTER	;write,-,-,-,-,-,masterVol(2) ;0=2/2, 1=2/3, 2=2/4, 3=2/5
+1:W64ENVSPD	;speed(8)
+	@4090		;read only
+2:W64MAINVOLR	;-,-,vol(6)
+1:W64MODVOLR	;-,-,vol(6)
+
+;;;;	[MMC5]	;channel=rec5,rec6,dac
+	;general
+	@5015
+1:STMMC5	;-,-,-,-,-,-,rec6,rec5 enable
+	;rec5
+	@5000
+2:REC5VOL	;duty(2),lenhlt,~env,vol/envPeriod(4)
+1:REC5LOPERIOD	;loPeriod(8)
+1:REC5HIPERIOD	;length(5),hiPeriod(3)
+	;rec6
+2:REC6VOL
+1:REC6LOPERIOD
+1:REC6HIPERIOD
+;	dac
+	@5010
+1:DACMODE	;irq,-,-,-,-,-,-,RWmode(0 for write, 1 for read)	;useless in VirtuaNES
+1:DACDATA	;data(8)
+
+;;;;	[N163]	;channel=fx1,fx2,fx3,fx4,fx5,fx6,fx7,fx8
+	;N163 address port
+	@F800
+:NA		;autoinc,addr(7)
+	;N163 data port
+	@4800
+:ND		;dataRW(8)
+	;inner
+	@00
+64:FXWAVE	;64 byte data for all wave table in little endian nibble
+2:FX1LOFREQ	;loFreq(8)
+2:FX1MIDFREQ	;midFreq(8)
+2:FX1HIFREQ	;len(6),hiFreq(2)	;1,1,1,len(3),hiFreq(2) in VirtuaNES
+1:FX1WAVE	;wavestart(8)
+1:FX1VOL	;-,chcount(3),vol(4)
+2:FX2LOFREQ
+2:FX2MIDFREQ
+2:FX2HIFREQ
+1:FX2WAVE
+1:FX2VOL
+2:FX3LOFREQ
+2:FX3MIDFREQ
+2:FX3HIFREQ
+1:FX3WAVE
+1:FX3VOL
+2:FX4LOFREQ
+2:FX4MIDFREQ
+2:FX4HIFREQ
+1:FX4WAVE
+1:FX4VOL
+2:FX5LOFREQ
+2:FX5MIDFREQ
+2:FX5HIFREQ
+1:FX5WAVE
+1:FX5VOL
+2:FX6LOFREQ
+2:FX6MIDFREQ
+2:FX6HIFREQ
+1:FX6WAVE
+1:FX6VOL
+2:FX7LOFREQ
+2:FX7MIDFREQ
+2:FX7HIFREQ
+1:FX7WAVE
+1:FX7VOL
+2:FX8LOFREQ
+2:FX8MIDFREQ
+2:FX8HIFREQ
+1:FX8WAVE
+1:FX8VOL
+
+;;;;	[FME7]	;channel=sqr1,sqr2,sqr3(,fnoise,fenv)
+	;FME7 address port
+	@C000
+:FA		;-,-,-,-,addr(4)
+	;FME7 data port
+	@E000
+:FD		;dataW(8)
+	;inner
+	@00
+1:SQR1LOPERIOD	;loPeriod(8)
+1:SQR1HIPERIOD	;-,-,-,-,hiPeriod(4)
+1:SQR2LOPERIOD
+1:SQR2HIPERIOD
+1:SQR3LOPERIOD
+1:SQR3HIPERIOD
+1:FNOISEPERIOD	;-,-,-,period(5)
+1:STFME7	;-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+1:SQR1VOL	;-,-,-,env,vol(4)
+1:SQR2VOL
+1:SQR3VOL
+1:FENVLOPERIOD	;loPeriod(8)
+1:FENVHIPERIOD	;hiPeriod(8)
+1:FENVSHAPE	;-,-,-,-,cont,atk,alt,hold
+
+;;;;;;;;;;;;;;;;
+;	[linked_data]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+RET }
+
+:_PLAY_ {
+RET }
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+:FMINITDATA
+	$01 $21 $3F $00 $00 $F0 $00 $0F	;sin
+:FXINITDATA
+	$10 $32 $54 $76 $98 $BA $DC $FE	;tri
+	$EF $CD $AB $89 $67 $45 $23 $01
+	$CC $CC $CC $CC $CC $CC $CC $CC	;rec parts
+	$00 $00 $00 $00 $00 $00 $00 $00	;rec parts
+	$A8 $CB $ED $FF	$FF $DE $BC $8A	;custom1(sin)
+	$57 $34 $12 $00 $00 $21 $43 $75
+	$A8 $CB $ED $FF	$FF $DE $BC $8A	;custom2(sin)
+	$57 $34 $12 $00 $00 $21 $43 $75
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C
+	$00 $00 $00 $00 $E0 $00 $00 $7C

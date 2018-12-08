@@ -1,0 +1,7 @@
+ch1=2A03
+
+ch6=VRC6
+ch7=MMC5
+ch8=FME7
+ch9=N163(16)
+ch10=N163(8)

@@ -1,0 +1,70 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1
+\setoptail	0
+\setdefnumlen	1
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1
+\entry		1
+\name
+MMC5 metronome
+\artist
+
+\copyright
+
+\ntsc		16666
+\pal		20000
+\ntscpal	0
+\expand		0x08
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[MMC5]	;channel=rec5,rec6,dac
+	;general
+	@5015
+1:STMMC5	;-,-,-,-,-,-,rec6,rec5 enable
+	;rec5
+	@5000
+2:REC5VOL	;duty(2),lenhlt,~env,vol/envPeriod(4)
+1:REC5LOPERIOD	;loPeriod(8)
+1:REC5HIPERIOD	;length(5),hiPeriod(3)
+	;rec6
+2:REC6VOL
+1:REC6LOPERIOD
+1:REC6HIPERIOD
+;	dac
+	@5010
+1:DACMODE	;irq,-,-,-,-,-,-,RWmode(0 for write, 1 for read)	;useless in VirtuaNES
+1:DACDATA	;data(8)
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:TEMPOMUL 1:TEMPODIV 1:DMAX 1:DCOUNT 1:COUNT 1:DATA
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+	LI $00 ST %COUNT ST %DATA ST &DACDATA
+	LI #8 ST %DMAX ST %DCOUNT
+	LI #1 ST %TEMPOMUL
+	LI #3 ST %TEMPODIV
+RET }
+
+:_PLAY_ {
+	LD %COUNT SEC SBC %TEMPOMUL ST %COUNT BCC #1 RET
+	ADC %TEMPODIV ST %COUNT
+	DEC %DCOUNT BZE #1 RET
+	LD %DMAX ST %DCOUNT
+	LD %DATA XORI $FF ST %DATA ST &DACDATA
+RET }

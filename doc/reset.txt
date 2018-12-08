@@ -1,0 +1,12 @@
+	key-off	key-on
+2A03r	-	R
+2A03t	-	-
+2A03n	-	-
+2A03d	-	R
+VRC6r	R	-
+VRC6s	-	-
+VRC7	-	R(-)
+FDS	R	-
+MMC5	-	-
+N163	-	-(R)
+FME7	-	-

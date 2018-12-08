@@ -1,0 +1,84 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1
+\setoptail	0
+\setdefnumlen	1
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1
+\entry		1
+\name
+MMC5 test
+\artist
+
+\copyright
+
+\ntsc		16666
+\pal		20000
+\ntscpal	0
+\expand		0x08
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[MMC5]	;channel=rec5,rec6,dac
+	;general
+	@5015
+1:STMMC5	;-,-,-,-,-,-,rec6,rec5 enable
+	;rec5
+	@5000
+2:REC5VOL	;duty(2),lenhlt,~env,vol/envPeriod(4)
+1:REC5LOPERIOD	;loPeriod(8)
+1:REC5HIPERIOD	;length(5),hiPeriod(3)
+	;rec6
+2:REC6VOL
+1:REC6LOPERIOD
+1:REC6HIPERIOD
+;	dac
+	@5010
+1:DACMODE	;irq,-,-,-,-,-,-,RWmode(0 for write, 1 for read)	;useless in VirtuaNES
+1:DACDATA	;data(8)
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:STATE 1:COUNT
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+	LI #1 ST %STATE
+	LI #240 ST %COUNT
+	LI $00 ST &STMMC5
+	ST &DACDATA
+	LI $B8 ST &REC5VOL ST &REC6VOL
+	LI $03 ST &STMMC5
+RET }
+
+:_PLAY_ {
+	LD %STATE BNZ #1 RET
+	{ DEC %COUNT LD %COUNT BNZ #3 JMP &_CASE0 CMPI #120 BNE #3 JMP &_CASE120 CMPI #60 BNE #3 JMP &_CASE60 CMPI #180 BNE #3 JMP &_CASE180
+	;default
+		RET
+	:_CASE0
+		LI #0 ST %STATE
+	:_CASE120
+		LI $00 ST &STMMC5
+		ST &DACDATA
+		LI $03 ST &STMMC5
+		RET
+	:_CASE60
+	:_CASE180
+		LI $00 ST &REC5HIPERIOD ST &REC6HIPERIOD
+		LI #253 ST &REC5LOPERIOD ST &REC6LOPERIOD
+		LI $FF ST &DACDATA
+	:_BRK }
+RET }

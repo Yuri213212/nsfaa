@@ -1,0 +1,84 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1
+\setoptail	0
+\setdefnumlen	1
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1
+\entry		1
+\name
+VRC6 test
+\artist
+
+\copyright
+
+\ntsc		16666
+\pal		20000
+\ntscpal	0
+\expand		0x01
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[VRC6]	;channel=rec3,rec4,saw
+	;general
+	@9003
+:STVRC6		;0 for normal, 2 for 16x freq, 4 for 256x freq, 1 for 0x freq	;useless in VirtuaNES
+	;rec3
+	@9000
+1:REC3VOL	;pullHigh,duty(3),vol(4)
+1:REC3LOPERIOD	;loPeriod(8)
+1:REC3HIPERIOD	;enable,-,-,-,hiPeriod(4)
+	;rec4
+	@A000
+1:REC4VOL
+1:REC4LOPERIOD
+1:REC4HIPERIOD
+	;saw
+	@B000
+1:SAWVOL	;-,-,vol(6)
+1:SAWLOPERIOD
+1:SAWHIPERIOD
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:STATE 1:COUNT
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+	LI #1 ST %STATE
+	LI #240 ST %COUNT
+	LI $00 ST &REC3HIPERIOD ST &REC4HIPERIOD ST &SAWHIPERIOD
+	LI $78 ST &REC3VOL ST &REC4VOL
+	LI $10 ST &SAWVOL
+RET }
+
+:_PLAY_ {
+	LD %STATE BNZ #1 RET
+	{ DEC %COUNT LD %COUNT BNZ #3 JMP &_CASE0 CMPI #120 BNE #3 JMP &_CASE120 CMPI #60 BNE #3 JMP &_CASE60 CMPI #180 BNE #3 JMP &_CASE180
+	;default
+		RET
+	:_CASE0
+		LI #0 ST %STATE
+	:_CASE120
+		LI $00 ST &REC3HIPERIOD ST &REC4HIPERIOD ST &SAWHIPERIOD
+		RET
+	:_CASE60
+	:_CASE180
+		LI $80 ST &REC3HIPERIOD ST &REC4HIPERIOD
+		LI #253 ST &REC3LOPERIOD ST &REC4LOPERIOD
+		LI $81 ST &SAWHIPERIOD
+		LI $22 ST &SAWLOPERIOD
+	:_BRK }
+RET }

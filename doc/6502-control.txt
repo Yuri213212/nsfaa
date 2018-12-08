@@ -1,0 +1,27 @@
+NOP		EA		2	NOP
+
+CLC		18		2	CLC
+SEC		38		2	SEC
+CLV		B8		2	CLV
+CLI		58		2	CLI
+SEI		78		2	SEI
+CLD		D8		2	CLD
+SED		F8		2	SED
+
+BNE $??		D0 ??		2/3	BZC	BNE	BNZ
+BEQ $??		F0 ??		2/3	BZS	BEQ	BZE
+BPL $??		10 ??		2/3	BSC	BGE	BPZ	//GE:assume no overflow,real GE is S xnor V
+BMI $??		30 ??		2/3	BSS	BLT	BMI	//LT:assume no overflow,real LT is S xor V
+BCC $??		90 ??		2/3	BCC	BLO
+BCS $??		B0 ??		2/3	BCS	BHS
+BVC $??		50 ??		2/3	BVC
+BVS $??		70 ??		2/3	BVS
+
+JMP $????	4C ????		3	JMP
+JMP ($????)	6C ????		5	JMP()
+
+JSR $????	20 ????		6	CALL
+RTS		60		6	RET
+
+BRK		00		7	SVC
+RTI		40		6	RTI

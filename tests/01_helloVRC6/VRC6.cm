@@ -1,0 +1,30 @@
+//@00
+var1 state,count;
+
+//@8000
+_init_(){
+	state=1;
+	count=240;
+	sawhiperiod=rec4hiperiod=rec3hiperiod=0x00;	//all key-off
+	rec4vol=rec3vol=0x78				//set vol 0x8(-6dB)
+	sawvol=0x10;					//set vol 0x10(-6dB)
+}
+
+_play_(){
+	if (!state) return;
+	switch (--count){
+	default:
+		return;
+	case 0:
+		state=0;
+	case 120:	//all key-off
+		sawhiperiod=rec4hiperiod=rec3hiperiod=0x00;
+		return;
+	case 60:	//all key-on
+	case 180:
+		rec4hiperiod=rec3hiperiod=0x80;
+		rec4loperiod=rec3loperiod=253;
+		sawhiperiod=0x81;	//290
+		sawloperiod=0x22;
+	}
+}

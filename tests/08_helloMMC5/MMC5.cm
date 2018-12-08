@@ -1,0 +1,32 @@
+//@00
+var1 state,count;
+
+//@8000
+_init_(){
+	state=1;
+	count=240;
+	stmmc5=0x00;		//rec key-off
+	dacdata=0x00;		//init dac data 0x00
+	rec6vol=rec5vol=0xb8;	//set vol 0x8(-6dB)
+	stmmc5=0x03;		//rec ready
+}
+
+_play_(){
+	if (!state) return;
+	switch (--count){
+	default:
+		return;
+	case 0:
+		state=0;
+	case 120:	//all key-off
+		stmmc5=0x00;
+		dacdata=0x00;
+		stmmc5=0x03;
+		return;
+	case 60:	//all key-on
+	case 180:
+		rec6hiperiod=rec5hiperiod=0x00;
+		rec6loperiod=rec5loperiod=253;
+		dacdata=0xff;
+	}
+}

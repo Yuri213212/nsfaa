@@ -1,0 +1,121 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1
+\setoptail	0
+\setdefnumlen	1
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1
+\entry		1
+\name
+VRC7 test
+\artist
+
+\copyright
+
+\ntsc		16666
+\pal		20000
+\ntscpal	0
+\expand		0x02
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[VRC7]	;channel=fm1,fm2,fm3,fm4,fm5,fm6(,fm7,fm8,fm9)
+	;VRC7 address port
+	@9010
+:VA		;addr(8)
+	;VRC7 data port
+	@9030
+:VD		;dataW(8)
+	;inner
+	@00
+8:FMINS		;8 byte data to define instrument 0
+			;00 AM,vib,sust,krs,freqmul(4) mod
+			;01 AM,vib,sust,krs,freqmul(4) main
+			;02 kls(2),ModLv(6) mod
+			;03 kls(2),-,wavmain,wavmod,feedback(3)
+			;04 A(4),D(4) mod
+			;05 A(4),D(4) main
+			;06 S(4),R(4) mod
+			;07 S(4),R(4) main
+	@0E
+1:FMPERC		;-,-,mode,bass,snare,tom,cymbal,hihat	;hidden function in VirtuaNES
+	@10
+1:FM1FREQ	;loFreq(8)
+1:FM2FREQ
+1:FM3FREQ
+1:FM4FREQ
+1:FM5FREQ
+1:FM6FREQ
+1:FM7FREQ		;hidden function in VirtuaNES
+1:FM8FREQ		;hidden function in VirtuaNES
+1:FM9FREQ		;hidden function in VirtuaNES
+	@20
+1:FM1OCT	;-,-,sust,enable,oct(3),hiFreq
+1:FM2OCT
+1:FM3OCT
+1:FM4OCT
+1:FM5OCT
+1:FM6OCT
+1:FM7OCT		;hidden function in VirtuaNES
+1:FM8OCT		;hidden function in VirtuaNES
+1:FM9OCT		;hidden function in VirtuaNES
+	@30
+1:FM1VOL	;inst(4),vol(4)
+1:FM2VOL
+1:FM3VOL
+1:FM4VOL
+1:FM5VOL
+1:FM6VOL
+1:FM7VOL	;-,-,-,-,bassvol(4)		;hidden function in VirtuaNES
+1:FM8VOL	;hihatvol(4),snarevol(4)	;hidden function in VirtuaNES
+1:FM9VOL	;tomvol(4),cymbalvol(4)		;hidden function in VirtuaNES
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:STATE 1:COUNT
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+	LI #1 ST %STATE
+	LI #240 ST %COUNT
+	LI $00 LADX %FM1OCT STX &VA ST &VD
+	LI $02 LADX %FM1VOL STX &VA ST &VD
+	{ LIX $07 :_LOOP BPZ #3 JMP &_BRK
+		LD,X &FMINITDATA STX &VA ST &VD
+	:_CON DECX JMP &_LOOP :_BRK }
+RET }
+
+:_PLAY_ {
+	LD %STATE BNZ #1 RET
+	{ DEC %COUNT LD %COUNT BNZ #3 JMP &_CASE0 CMPI #120 BNE #3 JMP &_CASE120 CMPI #60 BNE #3 JMP &_CASE60 CMPI #180 BNE #3 JMP &_CASE180
+	;default
+		RET
+	:_CASE0
+		LI #0 ST %STATE
+	:_CASE120
+		LI $00 LADX %FM1OCT STX &VA ST &VD
+		RET
+	:_CASE60
+	:_CASE180
+		LI #145 LADX %FM1FREQ STX &VA ST &VD
+		LI $1A LADX %FM1OCT STX &VA ST &VD
+	:_BRK }
+RET }
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+:FMINITDATA
+	$01 $21 $3F $00 $00 $F0 $00 $0F	;sin

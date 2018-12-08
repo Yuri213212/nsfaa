@@ -1,0 +1,34 @@
+//@00
+var1 state,count;
+
+//@8000
+_init_(){
+	state=1;
+	count=240;
+	vrc7.fm1oct=0x00;	//key-off
+	vrc7.fm1vol=0x02;	//set vol 0x2(-6dB)
+	for (X=7;X>=0;--X){
+		vrc7.X=fminitdata[X];
+	}
+}
+
+_play_(){
+	if (!state) return;
+	switch (--count){
+	default:
+		return;
+	case 0:
+		state=0;
+	case 120:	//all key-off
+		vrc7.fm1oct=0x00;
+		return;
+	case 60:	//all key-on
+	case 180:
+		vrc7.fm1freq=145;
+		vrc7.fm1oct=0x1a;
+	}
+}
+
+const1 fminitdata[]={
+	$01 $21 $3F $00 $00 $F0 $00 $0F	;sin
+};

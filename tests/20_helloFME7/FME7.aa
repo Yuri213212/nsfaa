@@ -1,0 +1,92 @@
+;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\setophead	1
+\setoptail	0
+\setdefnumlen	1
+
+;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\songs		1
+\entry		1
+\name
+FME7 test
+\artist
+
+\copyright
+
+\ntsc		16666
+\pal		20000
+\ntscpal	0
+\expand		0x20
+\bankswitch	0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;
+;	[apu]
+;;;;;;;;;;;;;;;;
+;;;;	[FME7]	;channel=sqr1,sqr2,sqr3(,fnoise,fenv)
+	;FME7 address port
+	@C000
+:FA		;-,-,-,-,addr(4)
+	;FME7 data port
+	@E000
+:FD		;dataW(8)
+	;inner
+	@00
+1:SQR1LOPERIOD	;loPeriod(8)
+1:SQR1HIPERIOD	;-,-,-,-,hiPeriod(4)
+1:SQR2LOPERIOD
+1:SQR2HIPERIOD
+1:SQR3LOPERIOD
+1:SQR3HIPERIOD
+1:FNOISEPERIOD	;-,-,-,period(5)
+1:STFME7	;-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+1:SQR1VOL	;-,-,-,env,vol(4)
+1:SQR2VOL
+1:SQR3VOL
+1:FENVLOPERIOD	;loPeriod(8)
+1:FENVHIPERIOD	;hiPeriod(8)
+1:FENVSHAPE	;-,-,-,-,cont,atk,alt,hold
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:STATE 1:COUNT
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:_START_
+:_INIT_ {
+	LI #1 ST %STATE
+	LI #240 ST %COUNT
+	LI $3F LADX %STFME7 STX &FA ST &FD
+	LI $0D LADX %SQR1VOL STX &FA ST &FD
+	       LADX %SQR2VOL STX &FA ST &FD
+	       LADX %SQR3VOL STX &FA ST &FD
+RET }
+
+:_PLAY_ {
+	LD %STATE BNZ #1 RET
+	{ DEC %COUNT LD %COUNT BNZ #3 JMP &_CASE0 CMPI #120 BNE #3 JMP &_CASE120 CMPI #60 BNE #3 JMP &_CASE60 CMPI #180 BNE #3 JMP &_CASE180
+	;default
+		RET
+	:_CASE0
+		LI #0 ST %STATE
+	:_CASE120
+		LI $3F LADX %STFME7 STX &FA ST &FD
+		RET
+	:_CASE60
+	:_CASE180
+		LI #0 LADX %SQR1HIPERIOD STX &FA ST &FD
+		      LADX %SQR2HIPERIOD STX &FA ST &FD
+		      LADX %SQR3HIPERIOD STX &FA ST &FD
+		LI #126 LADX %SQR1LOPERIOD STX &FA ST &FD
+		        LADX %SQR2LOPERIOD STX &FA ST &FD
+		        LADX %SQR3LOPERIOD STX &FA ST &FD
+		LI $38 LADX %STFME7 STX &FA ST &FD
+	:_BRK }
+RET }
