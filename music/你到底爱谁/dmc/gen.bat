@@ -1,0 +1,9 @@
+..\..\..\dmc2bin.exe 09_B-2.dmc
+..\..\..\dmc2bin.exe 10_C-3.dmc
+..\..\..\dmc2bin.exe 14_E-3.dmc
+..\..\..\dmc2bin.exe 15_F-3.dmc
+..\..\..\dmc2bin.exe 17_G-3.dmc
+..\..\..\dmc2bin.exe 19_A-3.dmc
+..\..\..\dmc2bin.exe 21_B-3.dmc
+..\..\..\dmc2bin.exe 22_C-4.dmc
+..\..\..\dmc2bin.exe 24_D-4.dmc

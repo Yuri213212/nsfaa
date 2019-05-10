@@ -1,0 +1,1 @@
+copy /B /Y 00main7F.bin+01mainFF.bin+02mainFF.bin+03mainFF.bin+04mainFF.bin+05mainFF.bin+06mainFF.bin+07mainFF.bin+08mainBF.bin+09mainBF.bin+10mainBF.bin+11mainBF.bin+12mainBF.bin+13mainBF.bin+00sub.bin+01sub.bin+02sub.bin+031112sub.bin+04sub.bin+06sub.bin+07sub.bin+08sub.bin+10sub.bin+13sub.bin data.bin

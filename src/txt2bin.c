@@ -1,3 +1,14 @@
+/***
+
+txt2bin in nsfaa v0.2 Alpha
+Copyright (C) 2017-2018 Yuri213212
+Site:https://github.com/Yuri213212/nsfaa
+Email: yuri213212@vip.qq.com
+License: CC BY-NC-SA 4.0
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+***/
+
 #define UNICODE
 #define _UNICODE
 
