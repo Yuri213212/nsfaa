@@ -1,0 +1,77 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nsf	;file type: nsf
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+\nsf_trimend	1	;whether to omit dummy data of last bank (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nsf_songs	1	;total songs (def=1)
+\nsf_entry	1	;default song number (1 for first) (def=1)
+\nsf_name		;the next line is the string of name (def=nil)
+test FDS
+\nsf_artist		;the next line is the string of artist (def=nil)
+
+\nsf_copyright		;the next line is the string of (c) (def=nil)
+
+\nsf_div2A03	16666	;frequency divider from 1000000Hz to call nsf_:play for 2A03 (def=16666)	;useless in VirtuaNES
+\nsf_div2A07	20000	;frequency divider from 1000000Hz to call nsf_:play for 2A07 (def=20000)	;useless in VirtuaNES
+\nsf_apu	0	;APU type, 0 for 2A03, 1 for 2A07, 2 for both (def=0)
+\nsf_expand	0x04	;flag list for expansion chip (def=0x00)
+				;01 for VRC6
+				;02 for VRC7
+				;04 for FDS
+				;08 for MMC5
+				;10 for N163
+				;20 for S5B
+\nsf_bankswitch		;the next line is initial bank switch data, all 0 for unused (def=0x00*8)
+0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nsfSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank00]
+;;;;;;;;;;;;;;;;
+\bank NSF_4K
+\include	?/include/nsfDriver.ah
+\include	?/include/tuning/NSF_A-4=440Hz.ah
+
+@9F00	;256:STARTBANK
+$01
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank01]
+;;;;;;;;;;;;;;;;
+\bank NSF_4K
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+LI #60 ST %TEMPODIV
+LI $80 ST &W64EN
+{ LIX $3F :_LOOP BMI !_BRK
+	LD,X &W64INITDATA01 ST,X &W64WAVE
+:_CON DECX JMP &_LOOP :_BRK }
+LI $00 ST &W64EN
+CALL &ENDROW		;init
+
+LI $A0 CALL &W64_V		CALL &ENDROW	;... ... 80
+LIX #36 CALL &W64_NR		CALL &ENDROW	;A-4 ... ..
+CALL &W64_S			CALL &ENDROW	;--- ... ..
+LIX #36 CALL &W64_NR		CALL &ENDROW	;A-4 ... ..
+CALL &W64_S			CALL &ENDSONG	;--- ... ..
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+:W64INITDATA01	;sin
+	$1E $1B $18 $15 $12 $0F $0C $0A $08 $06 $04 $03 $01 $00 $00 $00
+	$00 $00 $00 $01 $03 $04 $06 $08 $0A $0C $0F $12 $15 $18 $1B $1E
+	$21 $24 $27 $2A $2D $30 $33 $35 $37 $39 $3B $3C $3E $3F $3F $3F
+	$3F $3F $3F $3E $3C $3B $39 $37 $35 $33 $30 $2D $2A $27 $24 $21

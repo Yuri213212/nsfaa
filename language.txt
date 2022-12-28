@@ -1,0 +1,20 @@
+﻿..
+
+----------
+The first line defines UI language.
+..		default UI language
+en		English
+ch		Chinese
+jp		Japanese
+----------
+第一行定义界面语言。
+..		默认的界面语言
+en		英语
+ch		中文
+jp		日语
+----------
+最初の行はUI言語を定義します。
+..		デフォルトUI言語
+en		英語
+ch		中国語
+jp		日本語

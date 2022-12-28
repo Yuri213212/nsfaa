@@ -1,0 +1,45 @@
+\nes_mapper	0x45	;mapper069
+
+;;;;;;;;;;;;;;;;
+;	[FME7]
+;;;;;;;;;;;;;;;;
+@8000	:FME7ADDR	; W	;-,-,-,-,addr(4)
+@A000	:FME7DATA	; W	;data(8)
+;inner
+@00	1:FME7CBANK00	;bank(8)
+@01	1:FME7CBANK04
+@02	1:FME7CBANK08
+@03	1:FME7CBANK0C
+@04	1:FME7CBANK10
+@05	1:FME7CBANK14
+@06	1:FME7CBANK18
+@07	1:FME7CBANK1C
+@08	1:FME7PBANK67	;WRAM,RAM,bank(6)			;useless in VirtuaNES
+@09	1:FME7PBANK89	;-,-,bank(6)
+@0A	1:FME7PBANKAB
+@0B	1:FME7PBANKCD
+@0C	1:FME7MIRROR	;-,-,-,-,-,-,mirror(2)
+@0D	1:FME7IRQ	;count,-,-,-,-,-,-,IRQ
+@0E	1:FME7LOCOUNTER	;loCounter(8)
+@0F	1:FME7HICOUNTER	;hiCounter(8)
+
+;;;;;;;;;;;;;;;;
+;	[S5B]
+;;;;;;;;;;;;;;;;
+@C000	:S5BADDR	; W	;addr(8)
+@E000	:S5BDATA	; W	;data(8)
+;inner
+@00	1:SQR1LOPERIOD	;loPeriod(8)
+@01	1:SQR1HIPERIOD	;-,-,-,-,hiPeriod(4)
+@02	1:SQR2LOPERIOD
+@03	1:SQR2HIPERIOD
+@04	1:SQR3LOPERIOD
+@05	1:SQR3HIPERIOD
+@06	1:SNOISEPERIOD	;-,-,-,period(5)
+@07	1:S5BSTATE	;-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+@08	1:SQR1VOL	;-,-,-,env,vol(4)
+@09	1:SQR2VOL
+@0A	1:SQR3VOL
+@0B	1:SENVLOPERIOD	;loPeriod(8)
+@0C	1:SENVHIPERIOD	;hiPeriod(8)
+@0D	1:SENVWAVE	;-,-,-,-,wave(4)

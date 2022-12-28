@@ -1,1 +1,0 @@
-i686-pc-mingw32-gcc -Wall -O3 -s -o dmc2bin.exe dmc2bin.c -mwindows

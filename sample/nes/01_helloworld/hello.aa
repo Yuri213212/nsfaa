@@ -1,0 +1,101 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nes	;file type: nes
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nes_mirror	1	;mirror flag, 0 for horizontal, 1 for vertical, 2 for 1-screen (some mapper only), 3 for 4-screen (some mapper only) (def=0)
+\nes_battery	0	;whether use battery-backed RAM (def=0)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[chr00]
+;;;;;;;;;;;;;;;;
+\bank CHR_8K
+@0000
+\include	?/include/CP437.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg00]
+;;;;;;;;;;;;;;;;
+\bank PRG_16K
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[ciram]
+;;;;;;;;;;;;;;;;
+@2020	:STATICSTART
+|4000
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[memory]
+;;;;;;;;;;;;;;;;
+@0200
+|0800
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+@C000
+:MESSAGE	"Hello '  "world! $00
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+:RESETHANDLER {
+	LI $00 ST &PPUCTRL
+	ST &PPUMASK
+	BIT &PPUSTATUS
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	LADX ^NAME0 STX &PPUADDR LADX %NAME0 STX &PPUADDR
+	LI $00
+	{ LIY #32 :_LOOP BZE !_BRK
+		{ LIX #32 :_LOOP BZE !_BRK
+			ST &PPUDATA
+		:_CON DECX JMP &_LOOP :_BRK }
+	:_CON DECY JMP &_LOOP :_BRK }
+	LADX ^PALETTEBG STX &PPUADDR LADX %PALETTEBG STX &PPUADDR
+	LI $2F ST &PPUDATA
+	LI $30 ST &PPUDATA
+	LADX ^STATICSTART STX &PPUADDR LADX %STATICSTART STX &PPUADDR
+	{ LIX $00 :_LOOP LD,X &MESSAGE BZE !_BRK
+		ST &PPUDATA
+	:_CON INCX JMP &_LOOP :_BRK }
+	LI #0 ST &PPUSCROLL ST &PPUSCROLL
+	LI $0A ST &PPUMASK
+	{ :_LOOP JMP &_LOOP }
+}
+
+:NMIHANDLER {
+RTI }
+
+:IRQHANDLER {
+RTI }
+
+;;;;;;;;;;;;;;;;
+;	[vector]
+;;;;;;;;;;;;;;;;
+|FFFA
+@FFFA
+&NMIHANDLER
+@FFFC
+&RESETHANDLER
+@FFFE
+&IRQHANDLER

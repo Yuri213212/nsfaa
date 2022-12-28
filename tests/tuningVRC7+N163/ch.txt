@@ -1,3 +1,0 @@
-ch6=sin
-ch7=sin16
-ch8=sin8

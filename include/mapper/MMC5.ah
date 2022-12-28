@@ -1,0 +1,47 @@
+\nes_mapper	0x05	;mapper005
+
+;;;;;;;;;;;;;;;;
+;	[MMC5]
+;;;;;;;;;;;;;;;;
+@5000	:REC3VOL	; W	;duty(2),lengthHalt,~env,vol/envPeriod(4)
+@5002	:REC3LOPERIOD	; W	;loPeriod(8)
+@5003	:REC3HIPERIOD	; W	;length(5),hiPeriod(3)
+@5004	:REC4VOL
+@5006	:REC4LOPERIOD
+@5007	:REC4HIPERIOD
+@5010	:DACMODE	;RW	;IRQ,-,-,-,-,-,-,modeR~W	;useless in VirtuaNES
+@5011	:DACDATA	; W	;data(8)
+@5015	:MMC5STATUS	;RW	;-,-,-,-,-,-,rec4,rec3 enable
+@5100	:MMC5PMODE	; W	;-,-,-,-,-,-,prgmode(2)
+@5101	:MMC5CMODE	; W	;-,-,-,-,-,-,chrmode(2)
+@5102	:MMC5RAMLOCK1	; W	;-,-,-,-,-,-,enable=10(2)
+@5103	:MMC5RAMLOCK2	; W	;-,-,-,-,-,-,enable=01(2)
+@5104	:MMC5EMODE	; W	;-,-,-,-,-,-,exrammode(2)
+@5105	:MMC5MIRROR	; W	;mirror(8)
+@5106	:MMC5FILLCHAR	; W	;char(8)
+@5107	:MMC5FILLCOLOR	; W	;-,-,-,-,-,-,bgpalette(2)
+@5113	:MMC5PBANK67	; W	;-,bank(7)
+@5114	:MMC5PBANK89	; W	;ROM,bank(7)
+@5115	:MMC5PBANKAB
+@5116	:MMC5PBANKCD
+@5117	:MMC5PBANKEF	; W	;-,bank(7)
+@5120	:MMC5CBANK00	; W	;bank(8)
+@5121	:MMC5CBANK04
+@5122	:MMC5CBANK08
+@5123	:MMC5CBANK0C
+@5124	:MMC5CBANK10
+@5125	:MMC5CBANK14
+@5126	:MMC5CBANK18
+@5127	:MMC5CBANK1C
+@5128	:MMC5CBANK0010
+@5129	:MMC5CBANK0414
+@512A	:MMC5CBANK0818
+@512B	:MMC5CBANK0C1C
+@5130	:MMC5CHIBANK	; W	;-,-,-,-,-,-,hiBank(2)		;useless in VirtuaNES
+@5200	:MMC5VSMODE	; W	;enable,right,-,boundary(5)
+@5201	:MMC5VSSCROLL	; W	;y(8)
+@5202	:MMC5VSBANK	; W	;bank(8)
+@5203	:MMC5IRQLINE	; W	;y(8)
+@5204	:MMC5IRQ	;RW	;IRQ,ppubusy,-,-,-,-,-,-
+@5205	:MULLO		;RW	;store data to MULLO and MULHI then read the product
+@5206	:MULHI

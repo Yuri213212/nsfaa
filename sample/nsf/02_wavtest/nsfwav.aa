@@ -1,0 +1,209 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nsf	;file type: nsf
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+\nsf_trimend	1	;whether to omit dummy data of last bank (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nsf_songs	1	;total songs (def=1)
+\nsf_entry	1	;default song number (1 for first) (def=1)
+\nsf_name		;the next line is the string of name (def=nil)
+wav test
+\nsf_artist		;the next line is the string of artist (def=nil)
+
+\nsf_copyright		;the next line is the string of (c) (def=nil)
+
+\nsf_div2A03	16666	;frequency divider from 1000000Hz to call nsf_:play for 2A03 (def=16666)	;useless in VirtuaNES
+\nsf_div2A07	20000	;frequency divider from 1000000Hz to call nsf_:play for 2A07 (def=20000)	;useless in VirtuaNES
+\nsf_apu	0	;APU type, 0 for 2A03, 1 for 2A07, 2 for both (def=0)
+\nsf_expand	0x08	;flag list for expansion chip (def=0x00)
+				;01 for VRC6
+				;02 for VRC7
+				;04 for FDS
+				;08 for MMC5
+				;10 for N163
+				;20 for S5B
+\nsf_bankswitch		;the next line is initial bank switch data, all 0 for unused (def=0x00*8)
+0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nsfSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank00]
+;;;;;;;;;;;;;;;;
+\bank NSF_4K
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@F0
+1:INDEX 1:PAGE
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+:DELAY_-58 {	;81-58=23
+	NOP NOP NOP NOP NOP ( ) ;17
+RET }	;6
+
+:DELAY_-36 {	;81-36=45
+	NOP NOP ( ) ( ) ( ) ( ) ( ) ;39
+RET }	;6
+
+:DELAY_-46 {	;81-46=35
+	NOP NOP NOP NOP ( ) ( ) ( ) ;29
+RET }	;6
+
+\nsf_:init {
+	LI $80 ST &DACDATA
+	{ LIY $FF :_LOOP TYA BNZ #3 JMP &_BRK	;delay()
+		{ LIX $FF :_LOOP TXA BNZ #3 JMP &_BRK
+			NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP
+		:_CON DECX JMP &_LOOP :_BRK }
+	:_CON DECY JMP &_LOOP :_BRK }
+
+	;81 cycle each, 22095.96Hz
+	CLC
+	{ LI $01 ST %PAGE :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+		ST &NSFBANKD	;4
+		CALL &DELAY_-58	;6+x-58
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D000 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D000 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D100 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D100 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D200 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D200 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D300 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D300 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D400 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D400 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D500 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D500 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D600 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D600 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D700 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D700 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D800 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D800 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$D900 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$D900 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DA00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DA00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DB00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DB00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DC00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DC00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DD00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DD00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DE00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DE00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+		CALL &DELAY_-46	;6+x-46
+		{ LI $00 ST %INDEX JMP &_START :_LOOP BCC #3 JMP &_BRK	;2+3+3/3/2+3
+			CALL &DELAY_-36	;6+x-36
+			LDX %INDEX LD,X 2$DF00 ST &DACDATA	;3+4+4
+			JMP &_CON	;3
+			:_START 
+			LDX %INDEX LD,X 2$DF00 ST &DACDATA	;3+4+4
+		:_CON LD %INDEX CLC ADCI $01 ST %INDEX JMP &_LOOP :_BRK }	;3+2+2+3+3
+	:_CON LD %PAGE CLC ADCI $01 ST %PAGE JMP &_LOOP :_BRK }	;3+2+2+3+3
+RET }
+
+\nsf_:play {
+RET }

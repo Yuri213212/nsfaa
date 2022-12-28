@@ -1,0 +1,129 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nsf	;file type: nsf
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+\nsf_trimend	1	;whether to omit dummy data of last bank (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nsf_songs	10	;total songs (def=1)
+\nsf_entry	1	;default song number (1 for first) (def=1)
+\nsf_name		;the next line is the string of name (def=nil)
+test VRC7
+\nsf_artist		;the next line is the string of artist (def=nil)
+
+\nsf_copyright		;the next line is the string of (c) (def=nil)
+
+\nsf_div2A03	16666	;frequency divider from 1000000Hz to call nsf_:play for 2A03 (def=16666)	;useless in VirtuaNES
+\nsf_div2A07	20000	;frequency divider from 1000000Hz to call nsf_:play for 2A07 (def=20000)	;useless in VirtuaNES
+\nsf_apu	0	;APU type, 0 for 2A03, 1 for 2A07, 2 for both (def=0)
+\nsf_expand	0x02	;flag list for expansion chip (def=0x00)
+				;01 for VRC6
+				;02 for VRC7
+				;04 for FDS
+				;08 for MMC5
+				;10 for N163
+				;20 for S5B
+\nsf_bankswitch		;the next line is initial bank switch data, all 0 for unused (def=0x00*8)
+0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nsfSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank00]
+;;;;;;;;;;;;;;;;
+\bank NSF_4K
+\include	?/include/nsfDriver.ah
+\include	?/include/tuning/NSF_A-4=440Hz.ah
+
+@9F00	;256:STARTBANK
+$01 $01 $01 $01 $01 $01 $01 $01 $01 $01
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank01]
+;;;;;;;;;;;;;;;;
+\bank NSF_4K
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+@8000
+LI #60 ST %TEMPODIV
+{ LIX $07 :_LOOP BMI !_BRK
+	LD,X &FMINITDATA01 STX &VRC7ADDR ST &VRC7DATA
+:_CON DECX JMP &_LOOP :_BRK }
+CALL &ENDROW		;init
+
+{ LD %SONGNUM CMPI #1 BNE #3 JMP &_CASE1 CMPI #2 BNE #3 JMP &_CASE2 CMPI #3 BNE #3 JMP &_CASE3 CMPI #4 BNE #3 JMP &_CASE4 CMPI #5 BNE #3 JMP &_CASE5 CMPI #6 BNE #3 JMP &_CASE6 CMPI #7 BNE #3 JMP &_CASE7 CMPI #8 BNE #3 JMP &_CASE8 CMPI #9 BNE #3 JMP &_CASE9
+;default
+	LI $04 CALL &FM1_V	LI $04 CALL &FM2_V	LI $04 CALL &FM3_V	LI $04 CALL &FM4_V	LI $04 CALL &FM5_V	LI $04 CALL &FM6_V	LI $04 CALL &FM7_V	LI $04 CALL &FM8_V	LI $04 CALL &FM9_V	CALL &ENDROW
+	LIX #62 CALL &FM1_NR	LIX #62 CALL &FM2_NR	LIX #62 CALL &FM3_NR	LIX #62 CALL &FM4_NR	LIX #62 CALL &FM5_NR	LIX #62 CALL &FM6_NR	LIX #62 CALL &FM7_NR	LIX #62 CALL &FM8_NR	LIX #62 CALL &FM9_NR	CALL &ENDROW
+	CALL &FM1_S		CALL &FM2_S		CALL &FM3_S		CALL &FM4_S		CALL &FM5_S		CALL &FM6_S		CALL &FM7_S		CALL &FM8_S		CALL &FM9_S		CALL &ENDROW
+	LIX #62 CALL &FM1_NR	LIX #62 CALL &FM2_NR	LIX #62 CALL &FM3_NR	LIX #62 CALL &FM4_NR	LIX #62 CALL &FM5_NR	LIX #62 CALL &FM6_NR	LIX #62 CALL &FM7_NR	LIX #62 CALL &FM8_NR	LIX #62 CALL &FM9_NR	CALL &ENDROW
+	CALL &FM1_S		CALL &FM2_S		CALL &FM3_S		CALL &FM4_S		CALL &FM5_S		CALL &FM6_S		CALL &FM7_S		CALL &FM8_S		CALL &FM9_S		CALL &ENDSONG
+:_CASE1
+	LI $04 CALL &FM1_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM1_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM1_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM1_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM1_S			CALL &ENDSONG	;--- ... ..
+:_CASE2
+	LI $04 CALL &FM2_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM2_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM2_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM2_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM2_S			CALL &ENDSONG	;--- ... ..
+:_CASE3
+	LI $04 CALL &FM3_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM3_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM3_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM3_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM3_S			CALL &ENDSONG	;--- ... ..
+:_CASE4
+	LI $04 CALL &FM4_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM4_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM4_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM4_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM4_S			CALL &ENDSONG	;--- ... ..
+:_CASE5
+	LI $04 CALL &FM5_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM5_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM5_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM5_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM5_S			CALL &ENDSONG	;--- ... ..
+:_CASE6
+	LI $04 CALL &FM6_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM6_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM6_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM6_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM6_S			CALL &ENDSONG	;--- ... ..
+:_CASE7
+	LI $04 CALL &FM7_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM7_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM7_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM7_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM7_S			CALL &ENDSONG	;--- ... ..
+:_CASE8
+	LI $04 CALL &FM8_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM8_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM8_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM8_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM8_S			CALL &ENDSONG	;--- ... ..
+:_CASE9
+	LI $04 CALL &FM9_V		CALL &ENDROW	;... ... A0
+	LIX #62 CALL &FM9_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM9_S			CALL &ENDROW	;--- ... ..
+	LIX #62 CALL &FM9_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &FM9_S			CALL &ENDSONG	;--- ... ..
+:_BRK }
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+:FMINITDATA01
+	$02 $21 $3F $00 $00 $F0 $00 $0F	;sin

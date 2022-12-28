@@ -1,0 +1,197 @@
+#define buttonwait	2		//wait at least 1 frame
+
+var1 wallclock;
+var1 controller1,buttonwaitto,buttonsample,buttonstate0,buttonstate1;
+var1 c,p0lo,p0hi,p1lo,p1hi,p2lo,p2hi,p3lo,p3hi;
+
+resetHandler(){
+	ppuctrl=A=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	X=0x00;				//init memory
+	do{
+		0x00[X]=0x00;//A
+		0x0400[X]=0x00;//A
+		0x0500[X]=0x00;//A
+		0x0600[X]=0x00;//A
+		0x0700[X]=0x00;//A
+	}while (++X);
+	c='A';
+	p0lo=0x20
+	p0hi=0x04;
+	p1hi=0x05;
+	p2hi=0x06;
+	p3hi=0x07;
+	while (ppustatus>=0);		//wait for second vblank
+	ppuaddr=name1;			//clear screen
+	A=0x00;
+	for (Y=32;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=0x00;//A
+		}
+	}
+	ppuaddr=paletteBG;		//set BG palette
+	ppudata=0x2F;//black
+	ppudata=0x30;//white
+	ppuaddr=paletteBG1;
+	ppudata=0x05;//dkred
+	ppuaddr=paletteBG2;
+	ppudata=0x2A;//green
+	ppuaddr=paletteBG3;
+	ppudata=0x12;//blue
+	ppuscroll=0,0;			//set position (0,0)
+	ppumask=0x0A;			//enable PPU (BG only)
+	ppustatus;			//acknowledgement
+	ppuctrl=0x81;			//enable NMI
+	for (;;){
+		controller1=0x01;	//init controller state
+		out=0x01,0x00;		//~SS signal for controllers
+		do{			//read controller1
+			controller1<<>=in1>>1;
+		}whilecc ();
+		if (!buttonstate0){			//stable
+			if (!buttonstate1){			//internal up state some buttons down
+				if (A=controller1){
+					buttonsample=A;
+					buttonstate0=0x80;
+					buttonwaitto=wallclock+buttonwait;
+				}
+			}else if (!(buttonstate1&controller1)){	//internal down state hot button up
+				buttonsample=0x00;//A
+				buttonstate0=0x80;
+				buttonwaitto=wallclock+buttonwait;
+			}
+		}else if(buttonwaitto-wallclock-1>=0){	//not TLE
+			if (A=buttonsample){			//internal up state pressing
+				if (A&=controller1){
+					buttonsample=A;
+				}else{
+					buttonstate0=0x00;//A
+					buttonstate1=0x00;
+				}
+			}else if (buttonstate1&controller1){	//internal down state hot button down
+				buttonstate0=0x00;
+			}
+		}else{					//TLE
+			buttonsample&=-buttonsample;
+			switch (buttonsample){//A
+			case BTN_RIGHT:
+				(p2lo,p2hi)[0]=c;//Y=0
+				++p2lo;
+				if (++c>='['){
+					c='A';
+				}
+				break;
+			case BTN_LEFT:
+				(p1lo,p1hi)[0]=c;
+				++p1lo;
+				if (++c>='['){
+					c='A';
+				}
+				break;
+			case BTN_DOWN:
+				(p3lo,p3hi)[0]=c;
+				if (++p3lo>=0xA0){
+					p3lo=0x00;
+				}
+				if (++c>='['){
+					c='A';
+				}
+				break;
+			case BTN_UP:
+				(p0lo,p0hi)[0]=c;
+				if (++p0lo<0x20){
+					p0lo=0x20;
+				}
+				if (++c>='['){
+					c='A';
+				}
+				break;
+			case BTN_START:
+				break;
+			case BTN_SELECT:
+				break;
+			case BTN_B:
+				A=attribute+0x01;
+				X=LO(&attribute);
+				do{
+					0x0700[X]=A;
+				}while (++X);
+				break;
+			case BTN_A:
+				*(p0lo,p0hi)=c;
+				if (++p0lo<0x20){
+					p0lo=0x20;
+				}
+				if (++c>='['){
+					c='A';
+				}
+				*(p1lo,p1hi)=c;
+				++p1lo;
+				if (++c>='['){
+					c='A';
+				}
+				*(p2lo,p2hi)=c;
+				++p2lo;
+				if (++c>='['){
+					c='A';
+				}
+				*(p3lo,p3hi)=c;
+				if (++p3lo>=0xA0){
+					p3lo=0x00;
+				}
+				if (++c>='['){
+					c='A';
+				}
+				break;
+			default://button up
+				switch (buttonstate1){
+				case BTN_RIGHT:
+					break;
+				case BTN_LEFT:
+					break;
+				case BTN_DOWN:
+					break;
+				case BTN_UP:
+					break;
+				case BTN_START:
+					break;
+				case BTN_SELECT:
+					break;
+				case BTN_B:
+					break;
+				case BTN_A:
+					break;
+				default:
+					;
+				}
+			}
+			buttonstate0=0x00;
+			buttonstate1=buttonsample;
+		}
+	}
+}//#no return
+
+NMIHandler(){
+	PUSH(A);
+	ppuaddr=wallclock&0x07|0x20,0x00;
+	if (!(0x02&wallclock)){
+		if (!(0x01&wallclock)){
+			ppudata=*0x0400,...,*0x04FF;
+		}else{
+			ppudata=*0x0500,...,*0x05FF;
+		}
+	}else{
+		if (!(0x01&wallclock)){
+			ppudata=*0x0600,...,*0x06FF;
+		}else{
+			ppudata=*0x0700,...,*0x07FF;
+		}
+	}
+	++wallclock;
+	A=wallclock&0x07;
+	ppuctrl=wallclock>>2&0x01^0x01|0x80;
+	ppuscroll=0,0;			//set position (0,0)
+	A=POP;
+}

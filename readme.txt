@@ -1,68 +1,59 @@
-﻿nsfaa (ver 0.2 alpha) by Yuri213212 (with tools and drivers to generate nsf music file)
+﻿nsfaa (ver 1.0) by Yuri213212
 
-使用协议：对于所有文件基本遵循CC BY-NC-SA 4.0，但是对于用户为了建立新nsf工程而仿写的代码以及转换的数据无此限制。
+使用协议：对于所有文件基本遵循CC BY-NC-SA 4.0，但是对于用户为了建立新工程而仿写的代码以及转换的数据无此限制。
 
-[程序构成]
-./dmc2bin.exe	将dmc文件转换成数据模块的程序；推荐的使用方法是拖动dmc文件到程序上，或者使用bat处理
-./nsfaa.exe	aa文件编译器；推荐的使用方法是拖动aa文件到程序上
-./txt2bin.exe	将满足特定要求（详见各个驱动对应的模板）的it文件的文本转换成数据模块的程序（需要手动复制粘贴并添加配置文件）；推荐的使用方法是拖动配置文件到程序上
+本程序为aa文件编译器，可以编译生成FC模拟器用的NSF、NES、FDS文件以及纯ROM数据。
 
-具体使用方法参考./music里的工程
+使用方法：
+拖拽aa文件到nsfaa.exe程序图标上，程序将把编译结果输出到aa文件所在文件夹。
+	aa文件的写法以及编译结果参见./sample里的示例工程。
 
-[文件格式]
+语言设置：
+修改language.txt可以设置程序的语言，程序支持英语、中文和日语，默认为系统语言，若系统语言不在支持语言列表里则默认英语。
+
+文件格式：
 aa	自创的语言“advanced assembler”语言源文件，程序代码可以做到与cm文件行单位的一一对应，使用nsfaa.exe编译，具体说明参见./doc/AdvancedAssembler.txt
 	（建议设置文本编辑器高亮选项为HSP模式）
-bat	批处理文件，./music里的工程中使用的都是针对windows的，双击即可执行
-bin	编译器以及其他工具输出的4KB对齐的数据模块，用来链接到nsf文件尾部，nsf程序中通过bankswitch调用链接的bin文件内容
-cm	自创c风语言源文件（名字取自“c minus”），数据类型只有长度区别并引入寄存器，用于程序设计（看成独立的注释文件），编译方法为手动编译，因此写法自由，只要你觉得很容易看懂
-	对于c语言常见结构的手动编译方法参见./doc/structure.txt
+ah	aa版的头文件，用法和c语言的.h文件差不多，逻辑是在被include的位置展开，内容可以是纯定义，也可以带数据甚至作为partial class。
+	（建议设置文本编辑器高亮选项为HSP模式）
+cm	自创c风语言源文件（名字取自“c minus”，也可以理解为“comment”），数据类型只有长度区别并引入寄存器，用于程序设计（看成独立的注释文件），编译方法为手动编译，因此写法自由，只要你觉得很容易看懂
+	对于c语言常见结构的手动编译方法参见./doc/C_Structure.txt
 	（建议设置文本编辑器高亮选项为C/C++模式）
-dmc	famitracker标准dpcm采样，为了链接需要将其扩展至4KB并添加长度等信息，使用dmc2bin.exe转换才能使用
-it	modplug tracker编辑的音频工程，用于乐谱文件设计，可以半自动地转换成程序模块，具体参见./music/readme.txt
-nsf	FC音乐程序模块，通过nsfaa.exe编译得到，有时编译的结果只是最开头的模块（参见./music里的工程），需要链接bin文件才能正常使用
-txt	音乐工程中是把it文件转换成bin的中间格式，每个文件是一页it文件文本，具体参见./music/readme.txt
 
-[资料]
-./doc/6502*.txt			CPU指令集，数据分成4列：6502汇编命令与操作数，内存十六进制表现，执行周期，aa命令名
+资料：
 ./doc/AdvancedAssembler.txt	aa语言的说明
-./doc/fxins.txt			N163常用波形音色列表
-./doc/memory.txt		FC的内存结构以及驱动的数据配置设计
 ./doc/ProgrammingGuide.txt	AdvancedAssembler编程指导，建议编程前先读该文档
-./doc/reset.txt			从virtuanes源码总结出来的音源相位重启时机
-./doc/structure.txt		c语言常见结构的手动编译方法
-./doc/template.txt		aa文件的模板，写新nsf程序的时候建议复制该文件改造，或者从该文件复制所有需要的部分
-./doc/w64ins.txt		FDS常用波形音色列表
+./doc/6502*.txt			CPU指令集，数据分成4列：6502汇编命令与操作数，内存十六进制表现，执行周期，aa命令名
+./doc/C_Structure.txt		c语言常见结构的手动编译方法
+./doc/nsfMemory.txt		FC的内存结构以及NSF驱动的数据配置设计
+./doc/SoundProtocol.txt		NSF驱动的协议列表，用于设计音乐数据编译器
+./doc/tempo/tempo.txt		程序生成的文件，用于设置tempo
 ./doc/fmins/fmins.txt		VRC7常用FM音色列表
-./doc/tuning/f.xls		根据virtuanes源码，对音源频率精确计算的表格，用来调音
-./drivers/annotation.txt	it文件的注解说明
-./drivers/itdata.txt		模板it文件的通道说明
-./drivers/readme.txt		模板说明
-./drivers/configguide.txt	txt2bin配置文件说明
-./drivers/itdata.txt		it文件的数据说明
-./drivers/readme.txt		nsf驱动说明
-./music/readme.txt		音乐工程的构造与编译说明
+./doc/fxins.txt			N163常用波形音色列表
+./doc/w64ins.txt		FDS常用波形音色列表
+./doc/color.txt			调色板与常用颜色数据
 
-[音色库]
-./libdmc	nsf文件用dpcm音色库
-./libit		it文件用音色库
+示例工程：
+./sample/nsf/00_empty		空NSF工程
+./sample/nsf/01_soundtest	NSF驱动与芯片测试，第0曲为该芯片全通道合奏，之后的曲目为各通道独奏
+./sample/nsf/02_wavtest		NSF形式的wav播放器，采样率22095.96Hz，由于NSF文件大小限制最多可以播放47秒
+./sample/nes/00_empty		空NES工程
+./sample/nes/01_helloworld	Hello world，没什么好解释的
+./sample/nes/02_iotest		手柄与显示测试，按下手柄上的按键，屏幕上对应位置会显示一个方块
+./sample/nes/03_spritetest	使用1P十字键控制游标（太阳符号）移动
+./sample/nes/04_buttontest	按钮驱动测试，1P左右键按下时计数器±0x01，上下键抬起时计数器±0x10
+./sample/nes/05_screentest	15Hz全屏刷新测试，1P十字键与A键按下时向4个区域写入大写字母，B键按下时改变颜色，建议将模拟器的连打设置为15Hz然后连打AB键看效果
+./sample/nes/06_soundtest	使用N163扩展的NES播放器测试，1P十字键选曲，A键开始，B键停止
+./sample/fds/*			这些工程的代码完全照搬对应的NES工程，用来测试将NES转换成FDS的可行性
+./sample/bin/CP437		将CHR数据定义转换成ROM数据
 
-[aa工程]
-./tests		音源测试用程序，如果想从0开始写程序建议先看懂这部分，学会每个APU的使用方法
-./drivers	我的nsf驱动模块，分为6大类，如果只想直接写乐谱数据的话可以考虑以此为模板改造
-./music		使用drivers下程序模块的音乐工程
-
-[外部工具与主要使用方式]
-VirtuaNES	（nsf执行环境）		http://virtuanes.s1.xrea.com/vnes_dl.php
-ModPlug Tracker	（主数据编辑器）	https://download.openmpt.org/archive/mpt_classic/
-OpenMPT		（辅助数据编辑器）	http://openmpt.org/download
-FamiTracker	（图形DPCM转换器）	http://famitracker.com/downloads.php
-Virtual ear	（虚拟示波器）		https://github.com/Yuri213212/vear
-
-[参考文献]
+参考文献：
+6502 Reference				https://www.nesdev.org/obelisk-6502-guide/reference.html
+NSF - Nesdev wiki			https://www.nesdev.org/wiki/NSF
+INES - NESdev Wiki			https://www.nesdev.org/wiki/INES
+FDS file format - NESdev Wiki		https://www.nesdev.org/wiki/FDS_file_format
+FDS disk format - NESdev Wiki		https://www.nesdev.org/wiki/FDS_disk_format
 VirtuaNES source code			http://virtuanes.s1.xrea.com/bin/virtuanessrc097.zip
-NSF - Nesdev wiki			https://wiki.nesdev.com/w/index.php/NSF
-6502 Reference				http://obelisk.me.uk/6502/reference.html
-Programming with unofficial opcodes	https://wiki.nesdev.com/w/index.php/Programming_with_unofficial_opcodes
 
-[TODO]
-完成fwg工程并与本工程联动，消除对外部编辑器的依赖并提供更加自动化的音乐工程编译环境
+更新说明：
+旧版的NSF工程及其驱动已被废弃，相关数据决定移至将与本工程联动的工程fwg，敬请期待。

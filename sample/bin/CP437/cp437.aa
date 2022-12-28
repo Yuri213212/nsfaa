@@ -1,0 +1,12 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		bin	;file type: bin
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[data00]
+;;;;;;;;;;;;;;;;
+\bank CHR_8K
+@0000
+\include	?/include/CP437.ah

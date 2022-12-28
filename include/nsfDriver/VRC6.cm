@@ -1,0 +1,57 @@
+//[rec5,6]		NRIV,N<-R,I<->V,reset on stop
+rec5_S(){	//rec5 stop
+	rec5hiperiod=0x00;
+}
+
+rec5_NRIV(A,X){	//rec5 note and insvol with reset, A=0,ins(3),vol(4), X=note
+	rec5vol=A;
+}//#no return
+
+rec5_NR(X){	//rec5 note with reset, X=note
+	rec5hiperiod=0x00;
+	rec5loperiod=divnotelo[X];
+	rec5hiperiod=divnotehi[X]|0x80;
+}
+
+rec5_NIV(A,X){	//rec5 note and insvol, A=0,ins(3),vol(4), X=note
+	rec5vol=A;
+}//#no return
+
+rec5_N(X){	//rec5 note, X=note
+	rec5loperiod=divnotelo[X];
+	rec5hiperiod=divnotehi[X]|0x80;
+}
+
+rec5_IV(A){	//rec5 insvol, A=0,ins(3),vol(4)
+	rec5vol=A;
+}
+
+//#same for rec6
+
+//[saw]			NR_V,N<-R,reset on stop	//no reset on VirtuaNES
+saw_S(){	//saw stop
+	sawhiperiod=0x00;
+}
+
+saw_NRV(A,X){	//saw note and vol with reset, A=-,-,vol(6), X=note
+	sawvol=A;
+}//#no return
+
+saw_NR(X){	//saw note with reset, X=note
+	sawhiperiod=0x00;
+	sawloperiod=sawnotelo[X];
+	sawhiperiod=sawnotehi[X]|0x80;
+}
+
+saw_NV(A,X){	//saw note and vol, A=-,-,vol(6), X=note
+	sawvol=A;
+}//#no return
+
+saw_N(X){	//saw note, X=note
+	sawloperiod=sawnotelo[X];
+	sawhiperiod=sawnotehi[X]|0x80;
+}
+
+saw_V(A){	//saw vol, A=-,-,vol(6)
+	sawvol=A;
+}

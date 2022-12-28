@@ -1,1 +1,1 @@
-i686-pc-mingw32-gcc -Wall -O3 -s -o nsfaa.exe nsfaa.c -mwindows
+i686-pc-mingw32-gcc -Wall -O3 -s -o nsfaa.exe nsfaa/nsfaa.c pathStack.dll langUtil.dll vlstr.dll stringReader.dll utf8Format.dll -mwindows

@@ -1,0 +1,69 @@
+////@D000
+//extern sample[0xff1];
+//@DFFE
+extern const1 samplespeed,samplelength;
+
+//[dpcm]		N___,N->R,reset on note
+dpcm_S(){	//dpcm stop
+	apustatus=0x0F;
+}
+
+dpcm_NR(X){	//dpcm note with reset, X=bank
+	apustatus=0x0F;
+	nsfbankD=X;
+	dpcmdata=0x40;
+	dpcmmode=samplespeed;
+	dpcmlen=samplelength;
+	apustatus=0x1F;
+}
+
+//[noise]		N_IV,N<->I,never stop, only mute/unmute
+noise_M(){	//noise mute
+	noisevol=0x30;
+}
+
+noise_NIV(A,X){	//noise noteins and vol, A=ins,-,-,-,note(4), X=-,-,1,1,vol(4)
+	noiseperiod=A;
+}//#no return
+
+noise_V(X){	//noise vol with start, X=-,-,1,1,vol(4)
+	noisevol=X;
+}
+
+noise_NI(A){	//noise noteins without start, A=ins,-,-,-,note(4)
+	noiseperiod=A;
+}
+
+//[tri]			N___,no reset
+tri_P(){	//tri pause
+	trilen=0x00;
+	apuirq=0xC0;
+}
+
+tri_N(X){	//tri note, X=note
+	triloperiod=divnotelo[X];
+	trihiperiod=divnotehi[X];
+	trilen=0x81;
+}
+
+//[rec1,2]		N_IV,N->R,I<->V,reset on note
+rec1_S(){	//rec1 stop
+	rec1sweep=0x00;
+	rec1hiperiod=0x07;
+}
+
+rec1_NRIV(A,X){	//rec1 note and insvol with reset, A=ins(2),1,1,vol(4), X=note
+	rec1vol=A;
+}//#no return
+
+rec1_NR(X){	//rec1 note with reset, X=note
+	rec1loperiod=divnotelo[X];
+	rec1hiperiod=divnotehi[X];
+	rec1sweep=0x08;
+}
+
+rec1_IV(A){	//rec1 insvol, A=ins(2),1,1,vol(4)
+	rec1vol=A;
+}
+
+//#same for rec2

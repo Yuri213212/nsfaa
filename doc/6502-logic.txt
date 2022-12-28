@@ -1,4 +1,5 @@
 logic:		Z,S
+bit:		Z,S,V
 shift,rotate:	Z,S,C
 
 AND #$??	29 ??		2	ANDI

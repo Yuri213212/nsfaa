@@ -1,0 +1,58 @@
+\include	?/include/CP437.ah
+
+@0010
+$00 $FF $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00	;bgcharunderline
+$FE $FE $FE $FE $FE $FE $FE $FE $00 $00 $00 $00 $00 $00 $00 $00	;bgcharbottom
+$F8 $F8 $F8 $F8 $F8 $F8 $F8 $F8 $03 $03 $03 $03 $03 $03 $03 $03	;bgcharleft0
+$F8 $F8 $F8 $F8 $F8 $F8 $F8 $F8 $03 $03 $03 $03 $03 $03 $03 $00	;bgcharleft1
+$38 $38 $38 $38 $38 $38 $38 $38 $83 $83 $83 $83 $83 $83 $83 $83	;bgcharmiddle0
+$38 $38 $38 $38 $38 $38 $38 $38 $83 $83 $83 $83 $83 $83 $83 $00	;bgcharmiddle1
+$3E $3E $3E $3E $3E $3E $3E $3E $80 $80 $80 $80 $80 $80 $80 $80	;bgcharright0
+$3E $3E $3E $3E $3E $3E $3E $3E $80 $80 $80 $80 $80 $80 $80 $00	;bgcharright1
+$00 $00 $00 $7C $7C $00 $00 $00 $00 $00 $00 $7C $7C $00 $00 $00	;bgcharled
+$00 $00 $18 $3C $3C $3C $3C $3C $00 $00 $00 $00 $00 $00 $00 $00	;bgcharup0
+$3C $3C $3C $3C $3C $3C $3C $3C $00 $00 $00 $00 $00 $00 $00 $00	;bgcharcenter0
+$3C $3C $3C $3C $3C $18 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00	;bgchardown0
+$00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $18 $3C $3C $3C $3C $3C	;bgcharup1
+$00 $00 $00 $00 $00 $00 $00 $00 $3C $3C $3C $3C $3C $3C $3C $3C	;bgcharcenter1
+$00 $00 $00 $00 $00 $00 $00 $00 $3C $3C $3C $3C $3C $18 $00 $00	;bgchardown1
+
+@1000
+$FE $FE $FE $FE $FE $FE $FE $FE $00 $00 $00 $00 $00 $00 $00 $00	;spcharbottom
+$FE $FE $FE $FE $FE $FE $FE $FE $00 $00 $00 $00 $00 $00 $00 $00
+$F8 $F8 $F8 $F8 $F8 $F8 $F8 $F8 $00 $00 $00 $00 $00 $00 $00 $00	;spcharleft
+$F8 $F8 $F8 $F8 $F8 $F8 $F8 $F8 $00 $00 $00 $00 $00 $00 $00 $00
+$38 $38 $38 $38 $38 $38 $38 $38 $00 $00 $00 $00 $00 $00 $00 $00	;spcharmiddle
+$38 $38 $38 $38 $38 $38 $38 $38 $00 $00 $00 $00 $00 $00 $00 $00
+$3E $3E $3E $3E $3E $3E $3E $3E $00 $00 $00 $00 $00 $00 $00 $00	;spcharright
+$3E $3E $3E $3E $3E $3E $3E $3E $00 $00 $00 $00 $00 $00 $00 $00
+$00 $00 $00 $00 $00 $00 $00 $00 $38 $38 $38 $38 $38 $38 $38 $38	;spcharblack
+$00 $00 $00 $00 $00 $00 $00 $00 $38 $38 $38 $38 $38 $38 $38 $00
+$00 $00 $00 $7C $7C $00 $00 $00 $00 $00 $00 $7C $7C $00 $00 $00	;spcharled
+$00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+@01	:BGCHARUNDERLINE
+@02	:BGCHARBOTTOM
+@03	:BGCHARLEFT0
+@04	:BGCHARLEFT1
+@05	:BGCHARMIDDLE0
+@06	:BGCHARMIDDLE1
+@07	:BGCHARRIGHT0
+@08	:BGCHARRIGHT1
+@09	:BGCHARLED
+@0A	:BGCHARUP0
+@0B	:BGCHARCENTER0
+@0C	:BGCHARDOWN0
+@0D	:BGCHARUP1
+@0E	:BGCHARCENTER1
+@0F	:BGCHARDOWN1
+
+@01	:SPCHARBOTTOM
+@03	:SPCHARLEFT
+@05	:SPCHARMIDDLE
+@07	:SPCHARRIGHT
+@09	:SPCHARBLACK
+@0B	:SPCHARLED

@@ -1,0 +1,70 @@
+#define staticstart	0x2020		//CIRAM static contents start address
+
+var1 controller1;
+
+resetHandler(){
+	ppuctrl=X=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	controller1=0x00;//X		//init memory
+	A=0xFF;				//clear OAM buffer
+	do{
+		oambuffer[X]=A;
+	}while (++X);
+	sp0name=0x0F;			//set SP0
+	sp0attribute=0x00;//X
+	sp0x=0x00;
+	sp0y=0x07;
+	while (ppustatus>=0);		//wait for second vblank
+	ppuaddr=name0;			//clear screen
+	A=0x00;//X
+	for (Y=32;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=0x00;//A
+		}
+	}
+	ppuaddr=paletteBG;		//set BG palette
+	ppudata=0x2F;//black
+	ppudata=0x30;//white
+	ppuaddr=paletteSP0;		//set SP palette
+	ppudata=0x30;//white
+	ppuaddr=staticstart;		//print static contents
+	A=0xF9;
+	for (Y=28;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=0xF9;//A
+		}
+	}
+	ppuscroll=0,0;			//set position (0,0)
+	oamaddr=0x00;			//transfer OAM data
+	oamdma=HI(oambuffer);
+	ppumask=0x1E;			//enable PPU
+	ppustatus;			//acknowledgement
+	ppuctrl=0x80;			//enable NMI
+	for (;;)
+}//#no return
+
+NMIHandler(){
+	PUSH(A);
+	oamaddr=0x00;			//transfer OAM data
+	oamdma=HI(oambuffer);
+	controller1=0x01;		//init controller state
+	out=0x01,0x00;			//~SS signal for controllers
+	do{				//read controller1
+		controller1<<>=in1>>1;
+	}whilecc ();
+	if (BTN_RIGHT&controller1){
+		++sp0x;
+	}
+	if (BTN_LEFT&controller1){
+		--sp0x;
+	}
+	if (BTN_DOWN&controller1){
+		++sp0y;
+	}
+	if (BTN_UP&controller1){
+		--sp0y;
+	}
+	A=POP();
+}

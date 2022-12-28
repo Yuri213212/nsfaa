@@ -1,0 +1,1 @@
+i686-pc-mingw32-gcc -Wall -O3 -s -shared -o stringReader.dll dll/stringReader/stringReader.c

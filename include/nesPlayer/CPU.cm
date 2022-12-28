@@ -1,0 +1,85 @@
+////@C000
+//extern sample0[0xff1];
+//@CFFE
+extern const1 samplespeed0,samplelength0;
+
+////@D000
+//extern sample1[0xff1];
+//@DFFE
+extern const1 samplespeed1,samplelength1;
+
+//[dpcm]		N___,N->R,reset on note
+dpcm_S(){	//dpcm stop
+	apustatus=0x0F;
+}
+
+dpcm_NR(X){	//dpcm note with reset, X=-,hi,bank(6)
+	apustatus=0x0F;
+	n163PbankCD=X&0x3F;
+	dpcmdata=A=X&0x40;
+	if (!A){
+		dpcmmode=samplespeed0;
+		dpcmlen=samplelength0;
+	}else{
+		dpcmmode=samplespeed1;
+		dpcmlen=samplelength1;
+	}
+	apustatus=0x1F;
+}
+
+//[noise]		N_IV,N<->I,never stop, only mute/unmute
+noise_M(){	//noise mute
+	noisevol=0x30;
+	noisestate=0x00;
+}
+
+noise_NIV(A,X){	//noise noteins and vol, A=ins,-,-,-,note(4), X=-,-,1,1,vol(4)
+	noiseperiod=A;
+}//#no return
+
+noise_V(X){	//noise vol with start, X=-,-,1,1,vol(4)
+	noisevol=X;
+	noisestate=X&0x0F;
+}
+
+noise_NI(A){	//noise noteins without start, A=ins,-,-,-,note(4)
+	noiseperiod=A;
+}
+
+//[tri]			N___,no reset
+tri_P(){	//tri pause
+	trilen=0x00;
+	apuirq=0xC0;
+	keytri=keyoff;
+}
+
+tri_N(X){	//tri note, X=note
+	triloperiod=divnotelo[X];
+	trihiperiod=divnotehi[X];
+	trilen=0x81;
+	keytri=X+trikeyoffset;
+}
+
+//[rec1,2]		N_IV,N->R,I<->V,reset on note
+rec1_S(){	//rec1 stop
+	rec1sweep=0x00;
+	rec1hiperiod=0x07;
+	keyrec1=keyoff;
+}
+
+rec1_NRIV(A,X){	//rec1 note and insvol with reset, A=ins(2),1,1,vol(4), X=note
+	rec1vol=A;
+}//#no return
+
+rec1_NR(X){	//rec1 note with reset, X=note
+	rec1loperiod=divnotelo[X];
+	rec1hiperiod=divnotehi[X];
+	rec1sweep=0x08;
+	keyrec1=X+reckeyoffset;
+}
+
+rec1_IV(A){	//rec1 insvol, A=ins(2),1,1,vol(4)
+	rec1vol=A;
+}
+
+//#same for rec2

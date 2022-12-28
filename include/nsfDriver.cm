@@ -1,0 +1,189 @@
+//@9900
+extern const1 w64notelo[64];	//w64
+extern const1 w64notehi[64];//data|0x40
+extern const1 sawnotelo[64];	//saw
+extern const1 sawnotehi[64];
+
+//@9A00
+extern const1 sqrnotelo[64];	//sqr1~3
+extern const1 sqrnotehi[64];
+extern const1 divnotelo[64];	//REC1~6,tri
+extern const1 divnotehi[64];
+
+//@9B00
+extern const1 fmnote[128];	//fm1~6
+extern const1 fmoct[128];
+
+//@9C00
+extern const1 fx16notelo[128];	//fx1~8
+extern const1 fx16notemid[128];
+
+//@9D00
+extern const1 fx16notehi[128];//data|0xF0
+extern const1 fx32notelo[128];
+
+//@9E00
+extern const1 fx32notemid[128];
+extern const1 fx32notehi[128];//data|0xE0
+
+//@9F00
+extern const1 startbank[256]=<weak>{};
+
+//@F0
+var1 apu,songnum,state,count,tempomul,tempodiv,ralo,rahi,bank,loopbank,loopralo,looprahi;
+
+//@9004
+const1 fdsinitreg[8]={	//4080~4087
+	0x80,0x00,0x00,0xC0,
+	0x80,0x00,0x00,0x80,
+};
+
+//@9014
+const1 cpuinitreg[20]={	//4000~4013
+	0x30,0x00,0x00,0x07,
+	0x30,0x00,0x00,0x07,
+	0x00,0x00,0x00,0x00,
+	0x30,0x00,0x00,0x00,
+	0x0F,0x40,0x40,0x00,
+};
+const1 mmc5initreg[8]={	//5000~5007
+	0x30,0x00,0x00,0x00,
+	0x30,0x00,0x00,0x00,
+};
+
+//@9031
+#include "./nsfDriver/CPU.ah"
+#include "./nsfDriver/MMC5.ah"
+#include "./nsfDriver/VRC6.ah"
+#include "./nsfDriver/FDS.ah"
+#include "./nsfDriver/S5B.ah"
+#include "./nsfDriver/VRC7.ah"
+#include "./nsfDriver/N163.ah"
+
+\nsf_:init(A){
+	apu=X;
+	songnum=A;
+//stop sound generators
+	apustatus=Y=0x00;			//2A03 kill sound
+	mmc5status=0x00;			//MMC5 kill sound
+	rec6hiperiod=rec5hiperiod=0x00;		//VRC6 kill sound
+	sawhiperiod=0x00;
+	fdsstatus=0x03;
+	w64hifreq=0xC0;				//FDS kill sound
+	s5b.s5bstate=0x3F;			//S5B kill sound
+	n163.fx8vol=0x00;			//N163 kill sound
+	for (X=fm9oct;X>=fm1oct;--X){		//VRC7 kill sound
+		vrc7.X=0x00;
+	}
+//init CPU
+	for (X=0x13;X>=0;--X){
+		rec1vol[X]=cpuinitreg[X];
+	}
+	apustatus=0x0F;
+	apuirq=0xC0;
+	noiselen=0x00;
+//init MMC5
+	for (X=0x07;X>=0;--X){
+		rec3vol[X]=mmc5initreg[X];
+	}
+	mmc5status=0x03;
+//init VRC6
+	vrc6test=0x00;
+	rec6loperiod=rec5loperiod=0x00;
+	rec6vol=rec5vol=0x00;
+	sawloperiod=0x00;
+	sawvol=0x00;
+//init FDS
+	w64envspd=0x00;
+	for (X=0x07;X>=0;--X){
+		w64vol[X]=fdsinitreg[X];//last([0]) is 0x80
+	}
+	w64en=0x80;//A
+	A=Y;
+	for (X=0x3F;X>=0;--X){
+		w64wave[X]=0x00;//A
+	}
+	w64en=0x00;
+	for (X=0x1F;X>=0;--X){
+		wmodwave=0x00;
+	}
+//init S5B
+	for (X=senvwave;X>=sqr1vol;--X){
+		s5b.X=0x00;
+	}
+	for (--X;X>=0;--X){
+		s5b.X=0x00;
+	}
+//init VRC7
+	for (X=fm9freq;X>=0;--X){
+		vrc7.X=0x00;
+	}
+	A=0x0F;
+	for (X=fm9vol;X>=fm1vol;--X){
+		vrc7.X=0x0F;//A
+	}
+//init N163
+	n163addr=fxwavei;
+	for (X=0x7E;X>=0;--X){
+		n163data=0x00;
+	}
+//init system
+	count=4;				//init delay count
+	state=-1;				//play delay mode
+	tempodiv=tempomul=1;			//init tempo to 450*mul/div (dummy)
+	A=startbank[songnum];
+	if (!A){
+		state=0;			//refuse to execute null songs
+	}
+	nsfbank8=bank=A
+	ralo=0xFF;
+	rahi=0x7F;
+}
+
+\nsf_:play(){
+	if (!(A=state)) return;			//stop playing when state=0
+	if (A<0){
+		if (count){
+			--count;		//frame delay
+			return;
+		}
+		state=1;			//ready to play
+	}
+	ifcs (count=A=count-tempomul) return;	//tempo adapter
+	count=A+tempodiv;
+	PUSH(rahi);				//push return address for jump
+	PUSH(ralo);
+}						//this "return" does jump
+
+setloop(){	//set loop stamp, call this on the beginning of looping row
+	loopbank=bank;
+	loopralo=POP();
+	looprahi=A=POP();
+	PUSH(A);
+	PUSH(loopralo);
+}
+
+nextloop(){	//terminate current row, the next row will be the row which called setloop()
+	nsfbank8=bank=loopbank
+	ralo=loopralo;
+	rahi=looprahi;
+	POP();
+	POP();
+}
+
+nextpage(){	//terminate current row, the next row will be the start of next page
+	nsfbank8=++bank;
+	ralo=0xFF;
+	rahi=0x7F;
+	POP();
+	POP();
+}
+
+endsong(){	//terminate current row, and terminate the song
+	state=0;
+}//#no return
+
+endrow(){	//terminate current row, the next row is right after this call
+	ralo=POP();
+	rahi=POP();
+}

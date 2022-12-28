@@ -1,0 +1,131 @@
+#define buttonwait	2		//wait at least 1 frame
+
+#define staticstart	0x2020		//CIRAM static contents start address
+#define dynamicstart	0x2028		//CIRAM dynamic contents start address
+
+const1 hex2c[16]="0123456789ABCDEF";//#no nul
+const1 message[]="count=0x";
+
+var1 wallclock;
+var1 controller1,buttonwaitto,buttonsample,buttonstate0,buttonstate1;
+var1 count;
+
+resetHandler(){
+	ppuctrl=A=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	X=&count;			//init memory
+	do{
+		0x00[X]=0x00;//A
+	}while (--X);
+	while (ppustatus>=0);		//wait for second vblank
+	ppuaddr=name0;			//clear screen
+	for (Y=32;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=0x00;//A
+		}
+	}
+	ppuaddr=paletteBG;		//set BG palette
+	ppudata=0x2F;//black
+	ppudata=0x30;//white
+	ppuaddr=staticstart;		//print static contents
+	for (X=0;A=message[X];++X){
+		ppudata=A;
+	}
+	ppuscroll=0,0;			//set position (0,0)
+	ppumask=0x0A;			//enable PPU (BG only)
+	ppustatus;			//acknowledgement
+	ppuctrl=0x80;			//enable NMI
+	for (;;){
+		controller1=0x01;	//init controller state
+		out=0x01,0x00;		//~SS signal for controllers
+		do{			//read controller1
+			controller1<<>=in1>>1;
+		}whilecc ();
+		if (!buttonstate0){//stable
+			if (!buttonstate1){//internal up state some buttons down
+				if (controller1){
+					buttonsample=controller1;//A
+					buttonstate0=0x80;
+					buttonwaitto=wallclock+buttonwait;
+				}
+			}else if (!(buttonstate1&controller1)){//internal down state hot button up
+				buttonsample=0x00;//A
+				buttonstate0=0x80;
+				buttonwaitto=wallclock+buttonwait;
+			}
+		}else if(buttonwaitto-wallclock-1>=0){//not TLE
+			if (A=buttonsample){//internal up state pressing
+				if (A&=controller1){
+					buttonsample=A;
+				}else{
+					buttonstate0=0x00;//A
+					buttonstate1=0x00;
+				}
+			}else if (buttonstate1&controller1){//internal down state hot button down
+				buttonstate0=0x00;
+			}
+		}else{//TLE
+			buttonsample&=-buttonsample;
+			switch (buttonsample){//A
+			case BTN_RIGHT:
+				++count;
+				break;
+			case BTN_LEFT:
+				--count;
+				break;
+			case BTN_DOWN:
+				break;
+			case BTN_UP:
+				break;
+			case BTN_START:
+				break;
+			case BTN_SELECT:
+				break;
+			case BTN_B:
+				break;
+			case BTN_A:
+				break;
+			default://button up
+				switch (buttonstate1){
+				case BTN_RIGHT:
+					break;
+				case BTN_LEFT:
+					break;
+				case BTN_DOWN:
+					count-=0x10;
+					break;
+				case BTN_UP:
+					count+=0x10;
+					break;
+				case BTN_START:
+					break;
+				case BTN_SELECT:
+					break;
+				case BTN_B:
+					break;
+				case BTN_A:
+					break;
+				default:
+					;
+				}
+			}
+			buttonstate0=0x00;
+			buttonstate1=buttonsample;
+		}
+	}
+}//#no return
+
+NMIHandler(){
+	PUSH(A);
+	PUSH(X);
+	ppuaddr=dynamicstart;		//print dynamic contents
+	ppudata=hex2c[count>>4];
+	ppudata=hex2c[count&0x0F];
+	ppudata=' ',count;
+	ppuscroll=0,0;			//set position (0,0)
+	++wallclock;
+	X=POP();
+	A=POP();
+}

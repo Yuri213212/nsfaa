@@ -1,0 +1,39 @@
+//[senv]		NRI_,R<->I,reset on ins, used as alternate ins of sqr1~3
+senv_NRI(A,X){	//senv note and ins with reset, A=-,-,-,-,ins(4), X=note
+	s5b.senvwave=A;
+}//#no return
+
+senv_N(X){	//senv note, X=note
+	s5b.senvloperiod=sqrnotelo[X];
+	s5b.senvhiperiod=sqrnotehi[X];
+}
+
+senv_RI(A){	//senv ins with reset, A=-,-,-,-,ins(4)
+	s5b.senvwave=A;
+}
+
+//[snoise]		N___,never stop, common on-off control
+snoise_N(A){	//snoise note, A=-,-,-,note(5)
+	s5b.snoiseperiod=A;
+}
+
+//[sqr1~3]		N_IV,I<->V,never stop, common on-off control
+sqr1_NIV(A,X){	//sqr1 note and vol, A=-,-,-,ins,vol(4), X=note
+	s5b.sqr1vol=A;
+}//#no return
+
+sqr1_N(X){	//sqr1 note, X=note
+	s5b.sqr1loperiod=sqrnotelo[X];
+	s5b.sqr1hiperiod=sqrnotehi[X];
+}
+
+sqr1_IV(A){	//sqr1 vol, A=-,-,-,ins,vol(4)
+	s5b.sqr1vol=A;
+}
+
+//#same for sqr2~3
+
+//[s5b]
+s5b_state(A){	//common control, A=-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+	s5b.s5bstate=A;
+}

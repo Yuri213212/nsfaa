@@ -1,0 +1,25 @@
+//[rec3,4]		N_IV,N->R,I<->V,reset on note	//no reset on VirtuaNES
+rec3_S(){	//rec3 stop
+	mmc5status=0x02;
+	mmc5status=0x03;
+}
+
+rec3_NRIV(A,X){	//rec3 note and insvol with reset, A=ins(2),1,1,vol(4), X=note
+	rec3vol=A;
+}//#no return
+
+rec3_NR(X){	//rec3 note with reset, X=note
+	rec3loperiod=divnotelo[X];
+	rec3hiperiod=divnotehi[X];
+}
+
+rec3_IV(A){	//rec3 insvol, A=ins(2),1,1,vol(4)
+	rec3vol=A;
+}
+
+rec4_S(){	//rec4 stop
+	mmc5status=0x01;
+	mmc5status=0x03;
+}
+
+//#others same for rec4

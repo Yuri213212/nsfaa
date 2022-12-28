@@ -1,0 +1,19 @@
+$00~$FF		zeropage RAM
+$0100~$01FF	stack
+$0200~$07FF	RAM
+
+$6000~$7FFF	extended RAM
+$8000~$FFFF	ROM
+
+
+bank	REG	DPCM	FDS	usage
+6		X	W
+7		X	W
+8		X	W	Data
+9	VRC67	X	W	Driver
+A	VRC6	X	W
+B	VRC6	X	W
+C	S5B	O	W
+D		O	W	DPCMSample
+E	S5B	O	?
+F	N163	O	?

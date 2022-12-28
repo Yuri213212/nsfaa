@@ -1,0 +1,192 @@
+;;;;;;;;;;;;;;;;
+;	[NSF]
+;;;;;;;;;;;;;;;;
+@5FF6	:NSFBANK6	; W	;bank(8)
+@5FF7	:NSFBANK7
+@5FF8	:NSFBANK8
+@5FF9	:NSFBANK9
+@5FFA	:NSFBANKA
+@5FFB	:NSFBANKB
+@5FFC	:NSFBANKC
+@5FFD	:NSFBANKD
+@5FFE	:NSFBANKE
+@5FFF	:NSFBANKF
+
+;;;;;;;;;;;;;;;;
+;	[CPU]		;channel=dpcm,noise,tri,rec1,rec2
+;;;;;;;;;;;;;;;;
+@4000	:REC1VOL	; W	;duty(2),lengthHalt,~env,vol/envPeriod(4)
+@4001	:REC1SWEEP	; W	;sweep,period(3),negate,shift(3)
+@4002	:REC1LOPERIOD	; W	;loPeriod(8)
+@4003	:REC1HIPERIOD	; W	;length(5),hiPeriod(3)
+@4004	:REC2VOL
+@4005	:REC2SWEEP
+@4006	:REC2LOPERIOD
+@4007	:REC2HIPERIOD
+@4008	:TRILEN		; W	;lengthHalt,linarCount(7)
+@400A	:TRILOPERIOD	; W	;loPeriod(8)
+@400B	:TRIHIPERIOD	; W	;length(5),hiPeriod(3)
+@400C	:NOISEVOL	; W	;-,-,lengthHalt,~env,vol/envPeriod(4)
+@400E	:NOISEPERIOD	; W	;short,-,-,-,period(4)
+@400F	:NOISELEN	; W	;length(5),-,-,-
+@4010	:DPCMMODE	; W	;IRQ,loop,-,-,freq(4)
+@4011	:DPCMDATA	; W	;-,data(7)
+@4012	:DPCMSTART	; W	;addr(8)
+@4013	:DPCMLEN	; W	;length(8)
+@4015	:APUSTATUS	;RW	;DI,FI,-,dpcm,noise,tri,rec2,rec1 enable
+@4017	:APUIRQ		; W	;frameMode,~IRQ,-,-,-,-,-,-
+;test mode only
+@4018	:REC1REC2OUT	;R 	;dataRec2(4),dataRec1(4)	;useless in VirtuaNES
+@4019	:TRINOISEOUT	;R 	;dataNoise(4),dataTri(4)	;useless in VirtuaNES
+@401A	:DPCMOUT	;R 	;-,dataDpcm(7)			;useless in VirtuaNES
+	:APUTEST	; W	;disable,-,-,triPhase(5)	;useless in VirtuaNES
+
+;;;;;;;;;;;;;;;;
+;	[MMC5]		;channel=(dac,)rec3,rec4
+;;;;;;;;;;;;;;;;
+@5000	:REC3VOL	; W	;duty(2),lengthHalt,~env,vol/envPeriod(4)
+@5002	:REC3LOPERIOD	; W	;loPeriod(8)
+@5003	:REC3HIPERIOD	; W	;length(5),hiPeriod(3)
+@5004	:REC4VOL
+@5006	:REC4LOPERIOD
+@5007	:REC4HIPERIOD
+@5010	:DACMODE	;RW	;IRQ,-,-,-,-,-,-,modeR~W	;useless in VirtuaNES
+@5011	:DACDATA	; W	;data(8)
+@5015	:MMC5STATUS	;RW	;-,-,-,-,-,-,rec4,rec3 enable
+
+@5205	:MULLO		;RW	;store data to MULLO and MULHI then read the product
+@5206	:MULHI
+
+;;;;;;;;;;;;;;;;
+;	[VRC6]		;channel=rec5,rec6,saw
+;;;;;;;;;;;;;;;;
+@9000	:REC5VOL	; W	;pullHigh,duty(3),vol(4)
+@9001	:REC5LOPERIOD	; W	;loPeriod(8)
+@9002	:REC5HIPERIOD	; W	;enable,-,-,-,hiPeriod(4)
+@9003	:VRC6TEST	; W	;-,-,-,-,-,p>>8,p>>4,disable	;useless in VirtuaNES
+@A000	:REC6VOL
+@A001	:REC6LOPERIOD
+@A002	:REC6HIPERIOD
+@B000	:SAWVOL		; W	;-,-,vol(6)
+@B001	:SAWLOPERIOD
+@B002	:SAWHIPERIOD
+
+;;;;;;;;;;;;;;;;
+;	[FDS]		;channel=(wmod,)w64
+;;;;;;;;;;;;;;;;
+@4023	:FDSSTATUS	; W	;-,-,-,-,-,-,sound,disk		;useless in VirtuaNES
+@4040	:W64OUT		;R 	;-,-,~data(6)
+	64:W64WAVE	; W	;64 byte data for wave table in -,-,~data(6)
+@4080	:W64VOL		; W	;~env,inc,vol(6)/envspeed(6)	;max vol=0x20
+@4082	:W64LOFREQ	; W	;loFreq(8)
+@4083	:W64HIFREQ	; W	;disable,~env,-,-,hiFreq(4)
+@4084	:WMODVOL	; W	;~env,inc,vol(6)/envspeed(6)
+@4085	:WMODDATA	; W	;-,data(7)			;signed,40~3F
+@4086	:WMODLOFREQ	; W	;loFreq(8)
+@4087	:WMODHIFREQ	; W	;disable,-,-,-,hiFreq(4)
+@4088	:WMODWAVE	; W*32	;-,-,-,-,-,data(3)
+@4089	:W64EN		; W	;wavewrite,-,-,-,-,-,gain(2) ;0=2/2, 1=2/3, 2=2/4, 3=2/5
+@408A	:W64ENVSPD	; W	;speed(8)
+@4090	:W64VOLR	;R 	;-,-,vol(6)
+@4091	:W64PHASER	;R 	;phase(8)			;useless in VirtuaNES
+@4092	:WMODVOLR	;R 	;-,-,vol(6)
+
+;;;;;;;;;;;;;;;;
+;	[S5B]		;channel=(snoise,senv,)sqr1,sqr2,sqr3
+;;;;;;;;;;;;;;;;
+@C000	:S5BADDR	; W	;addr(8)
+@E000	:S5BDATA	; W	;data(8)
+;inner
+@00	1:SQR1LOPERIOD	;loPeriod(8)
+@01	1:SQR1HIPERIOD	;-,-,-,-,hiPeriod(4)
+@02	1:SQR2LOPERIOD
+@03	1:SQR2HIPERIOD
+@04	1:SQR3LOPERIOD
+@05	1:SQR3HIPERIOD
+@06	1:SNOISEPERIOD	;-,-,-,period(5)
+@07	1:S5BSTATE	;-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+@08	1:SQR1VOL	;-,-,-,env,vol(4)
+@09	1:SQR2VOL
+@0A	1:SQR3VOL
+@0B	1:SENVLOPERIOD	;loPeriod(8)
+@0C	1:SENVHIPERIOD	;hiPeriod(8)
+@0D	1:SENVWAVE	;-,-,-,-,wave(4)
+
+;;;;;;;;;;;;;;;;
+;	[VRC7]		;channel=fm1,fm2,fm3,fm4,fm5,fm6(,fm7,fm8,fm9)
+;;;;;;;;;;;;;;;;
+@E000	:VRC7EN		; W	;WRAM,~sound,-,-,-,-,mirror(2)	;useless in VirtuaNES
+@9010	:VRC7ADDR	; W	;addr(8)
+@9030	:VRC7DATA	; W	;data(8)
+;inner
+@00	:FMINS
+	1:FMOP1MUL	;am,vib,sus,ksr,mul(4)
+	1:FMOP2MUL
+	1:FMOP1AMP	;ksl(2),amp(6)
+	1:FMWAVE	;ksl(2),-,op2rect,op1rect,op1fb(3)
+	1:FMOP1AD	;A(4),D(4)
+	1:FMOP2AD
+	1:FMOP1SR	;S(4),R(4)
+	1:FMOP2SR
+@0E	1:FMPERC	;-,-,perc,bass,snare,tom,cymbal,hihat
+@0F	1:FMTEST	;-,-,-,-,fastlfo,resetphase,~lfo,maxvol	;useless in VirtuaNES
+@10	1:FM1FREQ	;loFreq(8)
+	1:FM2FREQ
+	1:FM3FREQ
+	1:FM4FREQ
+	1:FM5FREQ
+	1:FM6FREQ
+	1:FM7FREQ					;hidden function in VirtuaNES
+	1:FM8FREQ					;hidden function in VirtuaNES
+	1:FM9FREQ					;hidden function in VirtuaNES
+@20	1:FM1OCT	;-,-,~sus,on,oct(3),hiFreq
+	1:FM2OCT
+	1:FM3OCT
+	1:FM4OCT
+	1:FM5OCT
+	1:FM6OCT
+	1:FM7OCT					;hidden function in VirtuaNES
+	1:FM8OCT					;hidden function in VirtuaNES
+	1:FM9OCT					;hidden function in VirtuaNES
+@30	1:FM1VOL	;ins(4),vol(4)
+	1:FM2VOL
+	1:FM3VOL
+	1:FM4VOL
+	1:FM5VOL
+	1:FM6VOL
+	1:FM7VOL	;-,-,-,-,bassvol(4)		;hidden function in VirtuaNES
+	1:FM8VOL	;hihatvol(4),snarevol(4)	;hidden function in VirtuaNES
+	1:FM9VOL	;tomvol(4),cymbalvol(4)		;hidden function in VirtuaNES
+
+;;;;;;;;;;;;;;;;
+;	[N163]		;channel=fx1,fx2,fx3,fx4,fx5,fx6,fx7,fx8
+;;;;;;;;;;;;;;;;
+@E000	:N163EN		; W	;out,~sound,bank(6)		;useless in VirtuaNES
+@F800	:N163ADDR	; W	;autoInc,addr(7)
+@4800	:N163DATA	;RW	;data(8)
+;inner
+@00	64:FXWAVE	;64 byte data for all wave table in little endian nibble
+@40	1:FX1LOFREQ	;loFreq(8)
+	1:FX1LOPHASE	;loPhase(8)
+	1:FX1MIDFREQ	;midFreq(8)
+	1:FX1MIDPHASE	;midPhase(8)
+	1:FX1HIFREQ	;len(6),hiFreq(2)	;1,1,1,len(3),hiFreq(2) in VirtuaNES
+	1:FX1HIPHASE	;hiPhase(8)
+	1:FX1START	;start(8)
+	1:FX1VOL	;-,chcount(3),vol(4)
+@48	1:FX2LOFREQ	1:FX2LOPHASE	1:FX2MIDFREQ	1:FX2MIDPHASE	1:FX2HIFREQ	1:FX2HIPHASE	1:FX2START	1:FX2VOL
+@50	1:FX3LOFREQ	1:FX3LOPHASE	1:FX3MIDFREQ	1:FX3MIDPHASE	1:FX3HIFREQ	1:FX3HIPHASE	1:FX3START	1:FX3VOL
+@58	1:FX4LOFREQ	1:FX4LOPHASE	1:FX4MIDFREQ	1:FX4MIDPHASE	1:FX4HIFREQ	1:FX4HIPHASE	1:FX4START	1:FX4VOL
+@60	1:FX5LOFREQ	1:FX5LOPHASE	1:FX5MIDFREQ	1:FX5MIDPHASE	1:FX5HIFREQ	1:FX5HIPHASE	1:FX5START	1:FX5VOL
+@68	1:FX6LOFREQ	1:FX6LOPHASE	1:FX6MIDFREQ	1:FX6MIDPHASE	1:FX6HIFREQ	1:FX6HIPHASE	1:FX6START	1:FX6VOL
+@70	1:FX7LOFREQ	1:FX7LOPHASE	1:FX7MIDFREQ	1:FX7MIDPHASE	1:FX7HIFREQ	1:FX7HIPHASE	1:FX7START	1:FX7VOL
+@78	1:FX8LOFREQ	1:FX8LOPHASE	1:FX8MIDFREQ	1:FX8MIDPHASE	1:FX8HIFREQ	1:FX8HIPHASE	1:FX8START	1:FX8VOL
+@80	64:FXWAVEI
+@C0	1:FX1LOFREQI	1:FX1LOPHASEI	1:FX1MIDFREQI	1:FX1MIDPHASEI	1:FX1HIFREQI	1:FX1HIPHASEI	1:FX1STARTI	1:FX1VOLI
+@C8	1:FX2LOFREQI	1:FX2LOPHASEI	1:FX2MIDFREQI	1:FX2MIDPHASEI	1:FX2HIFREQI	1:FX2HIPHASEI	1:FX2STARTI	1:FX2VOLI
+@D0	1:FX3LOFREQI	1:FX3LOPHASEI	1:FX3MIDFREQI	1:FX3MIDPHASEI	1:FX3HIFREQI	1:FX3HIPHASEI	1:FX3STARTI	1:FX3VOLI
+@D8	1:FX4LOFREQI	1:FX4LOPHASEI	1:FX4MIDFREQI	1:FX4MIDPHASEI	1:FX4HIFREQI	1:FX4HIPHASEI	1:FX4STARTI	1:FX4VOLI
+@E0	1:FX5LOFREQI	1:FX5LOPHASEI	1:FX5MIDFREQI	1:FX5MIDPHASEI	1:FX5HIFREQI	1:FX5HIPHASEI	1:FX5STARTI	1:FX5VOLI
+@E8	1:FX6LOFREQI	1:FX6LOPHASEI	1:FX6MIDFREQI	1:FX6MIDPHASEI	1:FX6HIFREQI	1:FX6HIPHASEI	1:FX6STARTI	1:FX6VOLI
+@F0	1:FX7LOFREQI	1:FX7LOPHASEI	1:FX7MIDFREQI	1:FX7MIDPHASEI	1:FX7HIFREQI	1:FX7HIPHASEI	1:FX7STARTI	1:FX7VOLI
+@F8	1:FX8LOFREQI	1:FX8LOPHASEI	1:FX8MIDFREQI	1:FX8MIDPHASEI	1:FX8HIFREQI	1:FX8HIPHASEI	1:FX8STARTI	1:FX8VOLI

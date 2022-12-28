@@ -1,0 +1,170 @@
+#define buttonwait		2	//wait at least 1 frame
+
+//@C0
+var1 wallclock;
+var1 controller1,buttonwaitto,buttonsample,buttonstate0,buttonstate1;
+
+//@E000
+extern initoambuffer[256];
+
+//@E100
+extern const1 keyspy0[144];
+extern const1 bgattribute[64];
+extern const1 msgkb0[32];
+extern const1 hex2c[16];
+
+//@E200
+extern const1 keyspy1[144];
+extern const1 msgkb1[32];
+extern const1 msgkb2[32];
+extern const1 msgkb3[32];
+extern const1 dec2c1[16];
+
+//@E300
+extern const1 keyspchar0[144];
+extern const1 msgled[32];
+extern const1 msgunderline[32];
+extern const1 msgtitle[8],title[24];
+extern const1 dec2c0[16];
+
+//@E400
+extern const1 keyspx[144];
+extern const1 msgartist[8],artist[24];
+extern const1 msgversion[8],version[24];
+extern const1 msgcomment[8],comment[24];
+
+//@E500
+extern const1 msgtuning[32];
+extern const1 msgtempo[32];
+extern const1 msgsong[32];
+extern const1 cpuinitreg[20];
+
+//@E580
+extern const1 divnotelo[64];	//REC1~6,tri
+//@E5C0
+extern const1 divnotehi[64];
+
+//@E600
+extern const1 fx16notelo[128];	//fx1~8
+//@E680
+extern const1 fx16notemid[128];
+
+//@E700
+extern const1 fx16notehi[128];//data|0xF0
+//@E780
+extern const1 fx32notelo[128];
+
+//@E800
+extern const1 fx32notemid[128];
+//@E880
+extern const1 fx32notehi[128];//data|0xE0
+
+//@E900
+extern const1 startbank[256];
+
+#include "./nesPlayer/graphics.ah"
+#include "./nesPlayer/sound.ah"
+
+resetHandler(){
+	stop();				//stop sound generators
+	ppuctrl=A=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	wallclock=0x00;			//init memory
+	buttonstate0=0x00;
+	buttonstate1=0x00;
+	g_initmem();
+	while (ppustatus>=0);		//wait for second vblank
+	g_initppu();
+	for (;;){
+		controller1=0x01;	//init controller state
+		out=0x01,0x00;		//~SS signal for controllers
+		do{			//read controller1
+			controller1<<>=in1>>1;
+		}whilecc ();
+		if (!buttonstate0){//stable
+			if (!buttonstate1){//internal up state some buttons down
+				if (controller1){
+					buttonsample=controller1;//A
+					buttonstate0=0x80;
+					buttonwaitto=wallclock+buttonwait;
+				}
+			}else if (!(buttonstate1&controller1)){//internal down state hot button up
+				buttonsample=0x00;//A
+				buttonstate0=0x80;
+				buttonwaitto=wallclock+buttonwait;
+			}
+		}else if(buttonwaitto-wallclock-1>=0){//not TLE
+			if (A=buttonsample){//internal up state pressing
+				if (A&=controller1){
+					buttonsample=A;
+				}else{
+					buttonstate0=0x00;//A
+					buttonstate1=0x00;
+				}
+			}else if (buttonstate1&controller1){//internal down state hot button down
+				buttonstate0=0x00;
+			}
+		}else{//TLE
+			buttonsample&=-buttonsample;
+			switch (buttonsample){//A
+			default://button up
+				break;
+			case BTN_RIGHT:
+				if (++nextsong>=songs){
+					nextsong=0x00;
+				}
+				break;
+			case BTN_LEFT:
+				if (nextsong){
+					--nextsong;
+				}else{
+					nextsong=songs-1;
+				}
+				break;
+			case BTN_DOWN:
+				for (X=0x10;X;--X){
+					if (nextsong){
+						--nextsong;
+					}else{
+						nextsong=songs-1;
+					}
+				}
+				break;
+			case BTN_UP:
+				for (X=0x10;X;--X){
+					if (++nextsong>=songs){
+						nextsong=0x00;
+					}
+				}
+				break;
+			case BTN_START:
+				break;
+			case BTN_SELECT:
+				break;
+			case BTN_B:
+				stop();
+				break;
+			case BTN_A:
+				init(nextsong);
+				break;
+			}
+			buttonstate0=0x00;
+			buttonstate1=buttonsample;
+		}
+	}
+}//#no return
+
+NMIHandler(){
+	PUSH(A);
+	PUSH(X);
+	PUSH(Y);
+	g_refresh();
+	play();
+	g_next();
+	++wallclock;
+	Y=POP();
+	X=POP();
+	A=POP();
+}

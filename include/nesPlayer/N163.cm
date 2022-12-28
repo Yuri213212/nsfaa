@@ -1,0 +1,94 @@
+fxAkeyoff(A){		//hide fxA key, A=FXnLOFREQI
+	X=A>>3&0x07;
+	keyfx1[X]=keyoff;
+}
+
+fxA16keyon(A,X){	//show fxA key, A=FXnLOFREQI, X=note
+	PUSH(A);
+	Y=A>>3&0x07;
+	keyfx1[Y]=X+fx16keyoffset;
+	A=POP();
+}
+
+fxA32keyon(A,X){
+	PUSH(A);
+	Y=A>>3&0x07;
+	keyfx1[Y]=X+fx32keyoffset;
+	A=POP();
+}
+
+//[fx1~8]		NRIV
+fxA16_S(A){	//fxA stop, A=FXnLOFREQI
+	n163.A=
+		0x00,0x00,
+		0x00,0x00,
+		0xF0,0x00;
+	fxAkeyoff(A);
+}
+
+fxA32_S(A){
+	n163.A=
+		0x00,0x00,
+		0x00,0x00,
+		0xE0,0x00;
+	fxAkeyoff(A);
+}
+
+fxA16_P(){	//fxA pause, A=FXnLOFREQI
+	n163.A=
+		0x00,<read>,
+		0x00,<read>,
+		0xF0,<read>;
+	fxAkeyoff(A);
+}
+
+fxA32_P(){
+	n163.A=
+		0x00,<read>,
+		0x00,<read>,
+		0xE0,<read>;
+	fxAkeyoff(A);
+}
+
+fxA16_NR(A,X){	//fxA note with reset, A=FXnLOFREQI, X=note
+	fxA16keyon(A,X);
+	n163.A=
+		fx16notelo[X],0x00,
+		fx16notemid[X],0x00,
+		fx16notehi[X],0x00;
+}
+
+fxA32_NR(A,X){
+	fxA32keyon(A,X);
+	n163.A=
+		fx32notelo[X],0x00,
+		fx32notemid[X],0x00,
+		fx32notehi[X],0x00;
+}
+
+fxA16_N(A,X){	//fxA note, A=FXnLOFREQI, X=note
+	fxA16keyon(A,X);
+	n163.A=
+		fx16notelo[X],<read>,
+		fx16notemid[X],<read>,
+		fx16notehi[X],<read>;
+}
+
+fxA32_N(A,X){
+	fxA32keyon(A,X);
+	n163.A=
+		fx32notelo[X],<read>,
+		fx32notemid[X],<read>,
+		fx32notehi[X],<read>;
+}
+
+fxA_R(A){	//fxA reset, A=FXnLOPHASEI
+	n163.A=
+		0x00,
+		<read>,0x00,
+		<read>,0x00;
+}
+
+//fx_I()	//n163.A=ins, A=FXnSTARTI
+
+//fx_V()	//n163.A=-,chcount(3),vol(4), A=FXnVOLI

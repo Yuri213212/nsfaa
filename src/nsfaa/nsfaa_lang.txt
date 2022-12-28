@@ -1,0 +1,215 @@
+﻿#define VERSION		"v1.0"
+#define COPYRIGHT	"2017-2022"
+#define SITE		"https://github.com/Yuri213212/nsfaa"
+
+const wchar_t szAppName[]=		L"nsfaa";
+
+const wchar_t *szAbout;
+
+const char *szErr_Assert;
+const char *szErr_OpenFile;
+const char *szErr_MacroRedefine;
+const char *szErr_RelOutOfRange;
+const char *szErr_bank_SetOffsetForbidden;
+const char *szErr_bank_Underflow;
+const char *szErr_bank_Overflow;
+const char *szErr_bank_Wrap;
+const char *szErr_rom_NewBankMaxBankCount;
+const char *szErr_rom_SetBankIdNoBank;
+const char *szErr_rom_SetBankOffsetNoBank;
+const char *szErr_rom_GetLengthTooLong;
+const char *szErr_image_SetFdsBootToIdNoSide;
+const char *szErr_image_SetFdsBankIdNoSide;
+const char *szErr_image_NewFdsSideImageType;
+const char *szErr_image_NewFdsSideMaxSideCount;
+const char *szErr_image_NewBankNoSide;
+const char *szErr_image_NewBankUnknownType;
+const char *szErr_image_NewBankForbiddenType;
+const char *szErr_image_WriteByteNoBank;
+const char *szErr_image_ImportFileNoBank;
+const char *szErr_image_GetLengthNoParam;
+const char *szErr_refStack_PushNoBank;
+const char *szErr_labelList_AddRefNoBank;
+const char *szErr_labelList_FinalizeLabelUndefined;
+const char *szErr_aaFileStack_PushDupicateFile;
+const char *szErr_aaFileStack_ClearAt;
+const char *szErr_aaStatus_NoImage;
+const char *szErr_aaStatus_WriteInsOprandLen;
+const char *szErr_aaStatus_AddLabelRedefine;
+const char *szErr_aaStatus_CompileMinusLength;
+const char *szInfo_aaStatus_CompileGetAddress;
+const char *szErr_aaStatus_CompileIllegalOprand;
+const char *szErr_aaStatus_CompileCodeLen;
+const char *szErr_aaStatus_CompileSetAddr;
+const char *szErr_aaStatus_CompileBoundary;
+const char *szErr_aaStatus_CompileExceedBoundary;
+const char *szErr_aaStatus_CompileVoidLabel;
+const char *szErr_aaStatus_CompileLabelUndefined;
+const char *szErr_aaStatus_CompileTooMuchEnd;
+const char *szErr_aaStatus_CompileUnknownMacro;
+const char *szErr_aaStatus_CompileUnknownImage;
+const char *szErr_aaStatus_CompileUnknownIns;
+const char *szErr_aaStatus_CompileTooMuchBegin;
+
+void lang_init(HPS hps){
+	int UIlanguage,language;
+
+	UIlanguage=lang_getUserLang();
+	language=lang_getLangSetting(hps);
+	switch (UIlanguage){
+	case LANG_CH:
+		break;
+	case LANG_JP:
+		break;
+	case LANG_EN:
+	default:
+		break;
+	}
+	switch (language){
+	case LANG_CH:
+		szAbout=				L"nsfaa " VERSION "\r\nCopyright (C) " COPYRIGHT " Yuri213212\r\n网址：" SITE "\r\n邮箱：yuri213212@vip.qq.com\r\n使用协议：CC BY-NC-SA 4.0\r\nhttps://creativecommons.org/licenses/by-nc-sa/4.0/\r\n\r\n使用方法：拖拽.aa文件到程序图标上来编译。";
+
+		szErr_Assert=				"在函数%s检查点%d发生了断言失败，请报告这个问题。";
+		szErr_OpenFile=				"无法打开%s！";
+		szErr_MacroRedefine=			"无法重定义\\%s。";
+		szErr_RelOutOfRange=			"@%04X：无法将相对地址写成0x%X。";
+		szErr_bank_SetOffsetForbidden=		"面%d块%d：无法设置块%s的偏移。";
+		szErr_bank_Underflow=			"面%d块%d　@%04X：无法向0x%04X之前的地址写入数据。";
+		szErr_bank_Overflow=			"面%d块%d　@%04X：无法向0x%04X之后的地址写入数据。";
+		szErr_bank_Wrap=			"面%d块%d　@%04X：在这里写入数据将穿越至少一圈。";
+		szErr_rom_NewBankMaxBankCount=		"面%d：块数将超出限制值%d。";
+		szErr_rom_SetBankIdNoBank=		"面%d：无法设置块id，请正确地指定块。";
+		szErr_rom_SetBankOffsetNoBank=		"面%d：无法设置块的偏移，请正确地指定块。";
+		szErr_rom_GetLengthTooLong=		"面%d：数据太长ROM装不下。";
+		szErr_image_SetFdsBootToIdNoSide=	"无法设置boottoid，请正确地指定面。";
+		szErr_image_SetFdsBankIdNoSide=		"无法设置块id，请正确地指定面。";
+		szErr_image_NewFdsSideImageType=	"无法向非fds文件添加面。";
+		szErr_image_NewFdsSideMaxSideCount=	"面数将超出限制值%d。";
+		szErr_image_NewBankNoSide=		"无法添加块，请正确地指定面。";
+		szErr_image_NewBankUnknownType=		"未知的块类型%s。";
+		szErr_image_NewBankForbiddenType=	"无法添加类型为%s的块。";
+		szErr_image_WriteByteNoBank=		"无法写入数据，请正确地指定块。";
+		szErr_image_ImportFileNoBank=		"无法导入文件，请正确地指定块。";
+		szErr_image_GetLengthNoParam=		"请定义\\%s。";
+		szErr_refStack_PushNoBank=		"无法压入引用，请正确地指定块。";
+		szErr_labelList_AddRefNoBank=		"无法定义标签，请正确地指定块。";
+		szErr_labelList_FinalizeLabelUndefined=	"标签%s未定义。";
+		szErr_aaFileStack_PushDupicateFile=	"%s已经被打开！";
+		szErr_aaFileStack_ClearAt=		"\r\n　在文件%s行%d命令%d：%s";
+		szErr_aaStatus_NoImage=			"请先指定image。";
+		szErr_aaStatus_WriteInsOprandLen=	"非法的操作数长度%d。";
+		szErr_aaStatus_AddLabelRedefine=	"@%04X：无法重新定义标签%s。";
+		szErr_aaStatus_CompileMinusLength=	"语法错误，负数长度%d。";
+		szInfo_aaStatus_CompileGetAddress=	"地址为0x%04X。";
+		szErr_aaStatus_CompileIllegalOprand=	"语法错误，不能作为操作数。";
+		szErr_aaStatus_CompileCodeLen=		"无法将长度设为%d。";
+		szErr_aaStatus_CompileSetAddr=		"无法将地址设为%X。";
+		szErr_aaStatus_CompileBoundary=		"无效的边界地址%X。";
+		szErr_aaStatus_CompileExceedBoundary=	"@%04X：数据超出了边界。";
+		szErr_aaStatus_CompileVoidLabel=	"语法错误，空标签。";
+		szErr_aaStatus_CompileLabelUndefined=	"未定义的标签%s。";
+		szErr_aaStatus_CompileTooMuchEnd=	"语法错误，结束比开始多。";
+		szErr_aaStatus_CompileUnknownMacro=	"未知的宏%s。";
+		szErr_aaStatus_CompileUnknownImage=	"未知的文件类型%s。";
+		szErr_aaStatus_CompileUnknownIns=	"未知的命令名%s。";
+		szErr_aaStatus_CompileTooMuchBegin=	"语法错误，开始比结束多。";
+		break;
+	case LANG_JP:
+		szAbout=				L"nsfaa " VERSION "\r\nCopyright (C) " COPYRIGHT " Yuri213212\r\nウェブサイト：" SITE "\r\nメール：yuri213212@vip.qq.com\r\nライセンス：CC BY-NC-SA 4.0\r\nhttps://creativecommons.org/licenses/by-nc-sa/4.0/\r\n\r\n使い方：コンパイルする.aaファイルをプログラムアイコンにドロップする。";
+
+		szErr_Assert=				"関数%sチェックポイント%dにアサーション失敗しました、このバグを報告してください。";
+		szErr_OpenFile=				"%sが開きません。";
+		szErr_MacroRedefine=			"\\%sが再定義できません。";
+		szErr_RelOutOfRange=			"@%04X：相対アドレスを0x%Xと書くことはできません。";
+		szErr_bank_SetOffsetForbidden=		"サイド%dバンク%d：バンク%sのオフセットは設定できません。";
+		szErr_bank_Underflow=			"サイド%dバンク%d　@%04X：0x%04Xより前のアドレスにデータを書くことはできません。";
+		szErr_bank_Overflow=			"サイド%dバンク%d　@%04X：0x%04Xより後のアドレスにデータを書くことはできません。";
+		szErr_bank_Wrap=			"サイド%dバンク%d　@%04X：ここにデータを書くと一周以上回ることになります。";
+		szErr_rom_NewBankMaxBankCount=		"サイド%d：バンク数は制限値%dを超えます。";
+		szErr_rom_SetBankIdNoBank=		"サイド%d：バンクidが設定できません。バンクを正しく指定してください。";
+		szErr_rom_SetBankOffsetNoBank=		"サイド%d：バンクのオフセットが設定できません。バンクを正しく指定してください。";
+		szErr_rom_GetLengthTooLong=		"サイド%d：データは長すぎてROMに入りません。";
+		szErr_image_SetFdsBootToIdNoSide=	"boottoidが設定できません。サイドを正しく指定してください。";
+		szErr_image_SetFdsBankIdNoSide=		"バンクidが設定できません。サイドを正しく指定してください。";
+		szErr_image_NewFdsSideImageType=	"fdsでないファイルにサイドは追加できません。";
+		szErr_image_NewFdsSideMaxSideCount=	"サイド数は制限値%dを超えます。";
+		szErr_image_NewBankNoSide=		"バンクが追加できません。サイドを正しく指定してください。";
+		szErr_image_NewBankUnknownType=		"不明なバンクタイプ%sです。";
+		szErr_image_NewBankForbiddenType=	"タイプ%sのバンクが追加できません。";
+		szErr_image_WriteByteNoBank=		"データ書き込みができません。バンクを正しく指定してください。";
+		szErr_image_ImportFileNoBank=		"ファイルがインポートできません。バンクを正しく指定してください。";
+		szErr_image_GetLengthNoParam=		"\\%sを定義してください。";
+		szErr_refStack_PushNoBank=		"参照がプッシュできません。バンクを正しく指定してください。";
+		szErr_labelList_AddRefNoBank=		"ラベルが定義できません。バンクを正しく指定してください。";
+		szErr_labelList_FinalizeLabelUndefined=	"ラベル%sは未定義です。";
+		szErr_aaFileStack_PushDupicateFile=	"%sは既に開かれました。";
+		szErr_aaFileStack_ClearAt=		"\r\n　ファイル%s行%dコマンド%dに：%s";
+		szErr_aaStatus_NoImage=			"先にimageを指定してください。";
+		szErr_aaStatus_WriteInsOprandLen=	"不正のオペランド長さ%dです。";
+		szErr_aaStatus_AddLabelRedefine=	"@%04X：ラベル%sは再定義できません。";
+		szErr_aaStatus_CompileMinusLength=	"文法エラー、マイナスの長さ%dです。";
+		szInfo_aaStatus_CompileGetAddress=	"アドレスは0x%04Xです。";
+		szErr_aaStatus_CompileIllegalOprand=	"文法エラー、オペランドにはなりません。";
+		szErr_aaStatus_CompileCodeLen=		"長さを%dに設定できません。";
+		szErr_aaStatus_CompileSetAddr=		"アドレスを%Xにセットできません。";
+		szErr_aaStatus_CompileBoundary=		"無効な境界アドレス%Xです。";
+		szErr_aaStatus_CompileExceedBoundary=	"@%04X：データが境界を越えました。";
+		szErr_aaStatus_CompileVoidLabel=	"文法エラー、空のラベルです。";
+		szErr_aaStatus_CompileLabelUndefined=	"未定義のラベル%sです。";
+		szErr_aaStatus_CompileTooMuchEnd=	"文法エラー、終了は開始より多いです。";
+		szErr_aaStatus_CompileUnknownMacro=	"不明なマクロ%sです。";
+		szErr_aaStatus_CompileUnknownImage=	"不明なファイルタイプ%sです。";
+		szErr_aaStatus_CompileUnknownIns=	"不明な命令%sです。";
+		szErr_aaStatus_CompileTooMuchBegin=	"文法エラー、開始は終了より多いです。";
+		break;
+	case LANG_EN:
+	default:
+		szAbout=				L"nsfaa " VERSION "\r\nCopyright (C) " COPYRIGHT " Yuri213212\r\nSite: " SITE "\r\nEmail: yuri213212@vip.qq.com\r\nLicense: CC BY-NC-SA 4.0\r\nhttps://creativecommons.org/licenses/by-nc-sa/4.0/\r\n\r\nUsage: drop .aa file into icon to compile.";
+
+		szErr_Assert=				"Assertion failed in function %s check point %d, please report this bug.";
+		szErr_OpenFile=				"Can't open '%s'!";
+		szErr_MacroRedefine=			"Unable to redefine \\%s.";
+		szErr_RelOutOfRange=			"@%04X: Unable to write reletive address as 0x%X.";
+		szErr_bank_SetOffsetForbidden=		"Side %d Bank %d: Unable to set offset of bank %s.";
+		szErr_bank_Underflow=			"Side %d Bank %d @%04X: Unable to write data before 0x%04X.";
+		szErr_bank_Overflow=			"Side %d Bank %d @%04X: Unable to write data after 0x%04X.";
+		szErr_bank_Wrap=			"Side %d Bank %d @%04X: Writing data here is causing wrap.";
+		szErr_rom_NewBankMaxBankCount=		"Side %d: Bank count will exceed limit %d.";
+		szErr_rom_SetBankIdNoBank=		"Side %d: Unable to set bank id, please specify bank correctly.";
+		szErr_rom_SetBankOffsetNoBank=		"Side %d: Unable to set offset of bank, please specify bank correctly.";
+		szErr_rom_GetLengthTooLong=		"Side %d: Too long to fit ROM.";
+		szErr_image_SetFdsBootToIdNoSide=	"Unable to set boottoid, please specify side correctly.";
+		szErr_image_SetFdsBankIdNoSide=		"Unable to set bank id, please specify side correctly.";
+		szErr_image_NewFdsSideImageType=	"Unable to add side to non-fds image.";
+		szErr_image_NewFdsSideMaxSideCount=	"Side count will exceed limit %d.";
+		szErr_image_NewBankNoSide=		"Unable to add bank, please specify side correctly.";
+		szErr_image_NewBankUnknownType=		"Unknown bank type %s.";
+		szErr_image_NewBankForbiddenType=	"Unable to add bank of type %s.";
+		szErr_image_WriteByteNoBank=		"Unable to write byte to image, please specify bank correctly.";
+		szErr_image_ImportFileNoBank=		"Unable to import file to image, please specify bank correctly.";
+		szErr_image_GetLengthNoParam=		"Please define \\%s.";
+		szErr_refStack_PushNoBank=		"Unable to push reference, please specify bank correctly.";
+		szErr_labelList_AddRefNoBank=		"Unable to define label, please specify bank correctly.";
+		szErr_labelList_FinalizeLabelUndefined=	"Label %s undefined.";
+		szErr_aaFileStack_PushDupicateFile=	"'%s' has already been opened!";
+		szErr_aaFileStack_ClearAt=		"\r\n  At file '%s' line %d cmd %d: %s";
+		szErr_aaStatus_NoImage=			"Please specify image first.";
+		szErr_aaStatus_WriteInsOprandLen=	"Illegal operand length %d.";
+		szErr_aaStatus_AddLabelRedefine=	"@%04X: Can't redefine label '%s'.";
+		szErr_aaStatus_CompileMinusLength=	"Syntax error, minus length %d.";
+		szInfo_aaStatus_CompileGetAddress=	"Address is 0x%04X.";
+		szErr_aaStatus_CompileIllegalOprand=	"Syntax error, illegal as operand.";
+		szErr_aaStatus_CompileCodeLen=		"Can't set length to %d.";
+		szErr_aaStatus_CompileSetAddr=		"Can't set address to 0x%X.";
+		szErr_aaStatus_CompileBoundary=		"Invalid boundary address %X.";
+		szErr_aaStatus_CompileExceedBoundary=	"@%04X: Data exceeded boundary.";
+		szErr_aaStatus_CompileVoidLabel=	"Syntax error, void label.";
+		szErr_aaStatus_CompileLabelUndefined=	"Undefined label '%s'.";
+		szErr_aaStatus_CompileTooMuchEnd=	"Syntax error, more end than begin.";
+		szErr_aaStatus_CompileUnknownMacro=	"Unknown macro '%s'.";
+		szErr_aaStatus_CompileUnknownImage=	"Unknown image '%s'.";
+		szErr_aaStatus_CompileUnknownIns=	"Unknown instruction '%s'.";
+		szErr_aaStatus_CompileTooMuchBegin=	"Syntax error, more begin than end.";
+		break;
+	}
+}

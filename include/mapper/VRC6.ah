@@ -1,0 +1,30 @@
+\nes_mapper	0x18	;mapper024
+
+;;;;;;;;;;;;;;;;
+;	[VRC6]
+;;;;;;;;;;;;;;;;
+@8000	:VRC6PBANK89AB	; W	;-,-,-,-,bank(4)
+@9000	:REC5VOL	; W	;pullHigh,duty(3),vol(4)
+@9001	:REC5LOPERIOD	; W	;loPeriod(8)
+@9002	:REC5HIPERIOD	; W	;enable,-,-,-,hiPeriod(4)
+@9003	:VRC6TEST	; W	;-,-,-,-,-,p>>8,p>>4,disable	;useless in VirtuaNES
+@A000	:REC6VOL
+@A001	:REC6LOPERIOD
+@A002	:REC6HIPERIOD
+@B000	:SAWVOL		; W	;-,-,vol(6)
+@B001	:SAWLOPERIOD
+@B002	:SAWHIPERIOD
+;@B003	:VRC6MODE	; W	;WRAM,-,mode(6)			;useless in VirtuaNES
+@B003	:VRC6MIRROR	; W	;-,-,-,-,mirror(2),-,-
+@C000	:VRC6PBANKCD	; W	;-,-,-,bank(5)
+@D000	:VRC6CBANK00	; W	;bank(8)
+@D001	:VRC6CBANK04
+@D002	:VRC6CBANK08
+@D003	:VRC6CBANK0C
+@E000	:VRC6CBANK10
+@E001	:VRC6CBANK14
+@E002	:VRC6CBANK18
+@E003	:VRC6CBANK1C
+@F000	:VRC6COUNTER	; W	;counter(8)
+@F001	:VRC6IRQ	; W	;-,-,-,-,-,~div,enable,pending
+@F002	:VRC6ACK	; W	;-,-,-,-,-,-,-,-

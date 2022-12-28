@@ -1,0 +1,118 @@
+//@F0
+var1 songnum,state,count,tempomul,tempodiv,ralo,rahi,bank;
+var1 loopbank,loopralo,looprahi,looprownum0,looprownum1;
+
+override const1 cpuinitreg[20]={	//4000~4013
+	0x30,0x00,0x00,0x07,
+	0x30,0x00,0x00,0x07,
+	0x00,0x00,0x00,0x00,
+	0x30,0x00,0x00,0x00,
+	0x0F,0x40,0x40,0x00,
+};
+
+stop(){
+	state=Y=0;				//stop playing
+	apustatus=0x00;				//2A03 kill sound
+	n163.fx8vol=0x00;			//N163 kill sound
+//reset graphics
+	noisestate=0x00;
+	A=keyoff;
+	for (X=0;X<11;++X){
+		keytri[X]=A;
+	}
+}
+
+init(A){
+	songnum=A;
+//stop sound generators
+	stop();
+//init CPU
+	for (X=0x13;X>=0;--X){
+		rec1vol[X]=cpuinitreg[X];
+	}
+	apustatus=0x0F;
+	apuirq=0xC0;
+	noiselen=0x00;
+//init N163
+	n163addr=fxwavei;
+	for (X=0x7E;X>=0;--X){
+		n163data=0x00;
+	}
+//init graphics
+	transpose=0x00;
+	tempo0='4';
+	tempo1='5';
+	tempo2='0';
+	tempo3='0';
+	tempo4='0';
+	speed0=' ';
+	speed1='8';
+	song0=hex2c[songnum>>4];
+	song1=hex2c[songnum&0x0F];
+	rownum0=0xFE;
+	rownum1=0xFF;
+	maxrow0='?';
+	maxrow1='?';
+	maxrow2='?';
+	maxrow3='?';
+//init system
+	count=0;				//init tempo counter
+	state=1;				//ready to play
+	tempodiv=tempomul=1;			//init tempo to 450*mul/div (dummy)
+	A=startbank[songnum]&0x3F;
+	if (A==0x3F){
+		state=0;			//refuse to execute null songs
+	}
+	n163Pbank89=bank=A
+	ralo=0xFF;
+	rahi=0x7F;
+}
+
+play(){
+	if (!(A=state)) return;			//stop playing when state=0
+	ifcs (count=A=count-tempomul) return;	//tempo adapter
+	count=A+tempodiv;
+	++(rownum0,rownum1);
+	PUSH(rahi);				//push return address for jump
+	PUSH(ralo);
+}						//this "return" does jump
+
+setloop(){	//set loop stamp, call this on the beginning of looping row
+	looprownum0=rownum0;
+	looprownum1=rownum1;
+	loopbank=bank;
+	loopralo=POP();
+	looprahi=A=POP();
+	PUSH(A);
+	PUSH(loopralo);
+}
+
+nextloop(){	//terminate current row, the next row will be the row which called setloop()
+	rownum0=looprownum0;
+	rownum1=looprownum1;
+	n163Pbank89=bank=loopbank
+	ralo=loopralo;
+	rahi=looprahi;
+	POP();
+	POP();
+}
+
+nextpage(){	//terminate current row, the next row will be the start of next page
+	n163Pbank89=++bank;
+	ralo=0xFF;
+	rahi=0x7F;
+	POP();
+	POP();
+}
+
+endsong(){	//terminate current row, and terminate the song
+	state=0;
+}//#no return
+
+endrow(){	//terminate current row, the next row is right after this call
+	ralo=POP();
+	rahi=POP();
+}
+
+#include "./CPU.ah"
+#include "./N163.ah"

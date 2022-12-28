@@ -1,0 +1,82 @@
+//[dpcm]		N___,N->R,reset on note
+dpcm_S(){	//dpcm stop
+dpcm_NR(X){	//dpcm note with reset, X=bank
+//[noise]		N_IV,N<->I,never stop, only mute/unmute
+noise_M(){	//noise mute
+noise_NIV(A,X){	//noise noteins and vol, A=ins,-,-,-,note(4), X=-,-,1,1,vol(4)
+noise_V(X){	//noise vol with start, X=-,-,1,1,vol(4)
+noise_NI(A){	//noise noteins without start, A=ins,-,-,-,note(4)
+//[tri]			N___,no reset
+tri_P(){	//tri pause
+tri_N(X){	//tri note, X=note
+//[rec1,2]		N_IV,N->R,I<->V,reset on note
+rec1_S(){	//rec1 stop
+rec1_NRIV(A,X){	//rec1 note and insvol with reset, A=ins(2),1,1,vol(4), X=note
+rec1_NR(X){	//rec1 note with reset, X=note
+rec1_IV(A){	//rec1 insvol, A=ins(2),1,1,vol(4)
+
+//[rec3,4]		N_IV,N->R,I<->V,reset on note	//no reset on VirtuaNES
+rec3_S(){	//rec3 stop
+rec3_NRIV(A,X){	//rec3 note and insvol with reset, A=ins(2),1,1,vol(4), X=note
+rec3_NR(X){	//rec3 note with reset, X=note
+rec3_IV(A){	//rec3 insvol, A=ins(2),1,1,vol(4)
+
+//[rec5,6]		NRIV,N<-R,I<->V,reset on stop
+rec5_S(){	//rec5 stop
+rec5_NRIV(A,X){	//rec5 note and insvol with reset, A=0,ins(3),vol(4), X=note
+rec5_NR(X){	//rec5 note with reset, X=note
+rec5_NIV(A,X){	//rec5 note and insvol, A=0,ins(3),vol(4), X=note
+rec5_N(X){	//rec5 note, X=note
+rec5_IV(A){	//rec5 insvol, A=ins(2),1,1,vol(4)
+//[saw]			NR_V,N<-R,reset on stop	//no reset on VirtuaNES
+saw_S(){	//saw stop
+saw_NRV(A,X){	//saw note and vol with reset, A=0,ins(3),vol(4), X=note
+saw_NR(X){	//saw note with reset, X=note
+saw_NV(A,X){	//saw note and vol, A=0,ins(3),vol(4), X=note
+saw_N(X){	//saw note, X=note
+saw_V(A){	//saw vol, A=ins(2),1,1,vol(4)
+
+//[w64]			NR_V,N<-R,reset on stop
+w64_S(){	//w64 stop
+w64_P(){	//w64 pause
+w64_NRV(A,X){	//w64 note and vol with reset, A=1,-,vol(6), X=note
+w64_NR(X){	//w64 note with reset, X=note
+w64_NV(A,X){	//w64 note and vol, A=1,-,vol(6), X=note
+w64_N(X){	//w64 note, X=note
+w64_V(A){	//w64 vol, A=1,-,vol(6)
+
+//[senv]		NRI_,R<->I,reset on ins, used as alternate ins of sqr1~3
+senv_NRI(A,X){	//senv note and ins with reset, A=-,-,-,-,ins(4), X=note
+senv_N(X){	//senv note, X=note
+senv_RI(A){	//senv ins with reset, A=-,-,-,-,ins(4)
+//[snoise]		N___,never stop, common on-off control
+snoise_N(A){	//snoise note, A=-,-,-,note(5)
+//[sqr1~3]		N_IV,I<->V,never stop, common on-off control
+sqr1_NIV(A,X){	//sqr1 note and vol, A=-,-,-,ins,vol(4), X=note
+sqr1_N(X){	//sqr1 note, X=note
+sqr1_IV(A){	//sqr1 vol, A=-,-,-,ins,vol(4)
+//[s5b]
+s5b_state(A){	//common control, A=-,-,~noise3,~noise2,~noise1,~sqr3,~sqr2,~sqr1
+
+//[fm1~9]		NR_V,N<-R,reset on stop
+fm1_S(){	//fm1 stop
+fm1_F(A){	//fm1 fade, X=oct<<1
+fm1_P(){	//fm1 pause
+fm1_NRV(A,X){	//fm1 note and vol with reset, A=0,0,0,0,vol(4), X=note
+fm1_NR(X){	//fm1 note with reset, X=note
+fm1_NV(A,X){	//fm1 note and vol, A=0,0,0,0,vol(4), X=note
+fm1_N(X){	//fm1 note, X=note
+fm1_V(A){	//fm1 vol, A=0,0,0,0,vol(4)
+
+//[fx1~8]		NRIV
+fxA16_S(A){	//fxA stop, A=FXnLOFREQI
+fxA32_S(A){
+fxA16_P(A){	//fxA pause, A=FXnLOFREQI
+fxA32_P(A){
+fxA16_NR(A,X){	//fxA note with reset, A=FXnLOFREQI, X=note
+fxA32_NR(A,X){
+fxA16_N(A,X){	//fxA note, A=FXnLOFREQI, X=note
+fxA32_N(A,X){
+fxA_R(A){	//fxA reset, A=FXnLOPHASEI
+//fx_I()	//n163.A=ins, A=FXnSTARTI
+//fx_V()	//n163.A=-,chcount(3),vol(4), A=FXnVOLI

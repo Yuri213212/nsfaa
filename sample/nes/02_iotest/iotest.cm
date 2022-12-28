@@ -1,0 +1,62 @@
+#define staticstart	0x2020		//CIRAM static contents start address
+#define dynamicstart	0x2040		//CIRAM dynamic contents start address
+
+const1 message[]={'M',' ','A','B',0x0F,0x10,0x18,0x19,0x1B,0x1A,' ','A','B','-','-',0x18,0x19,0x1B,0x1A,0x00};
+
+resetHandler(){
+	ppuctrl=A=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	while (ppustatus>=0);		//wait for second vblank
+	ppuaddr=name0;			//clear screen
+	for (Y=32;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=0x00;//A
+		}
+	}
+	ppuaddr=paletteBG;		//set BG palette
+	ppudata=0x2F;//black
+	ppudata=0x30;//white
+	ppuaddr=staticstart;		//print static contents
+	for (X=0;A=message[X];++X){
+		ppudata=A;
+	}
+	ppuscroll=0,0;			//set position (0,0)
+	ppumask=0x0A;			//enable PPU (BG only)
+	ppustatus;			//acknowledgement
+	ppuctrl=0x80;			//enable NMI
+	for (;;)
+}//#no return
+
+NMIHandler(){
+	PUSH(A);
+	PUSH(X);
+	ppuaddr=dynamicstart;		//print dynamic contents
+	if (in1&0x04){			//check mic
+		ppudata=Y=0xFE;
+	}else{
+		ppudata=Y=' ';
+	}
+	ppudata=Y=' ';
+	out=0x01,0x00;			//~SS signal for controllers
+	A=0x01
+	for (X=8;X;--X){		//check controller 1
+		if (A&in1){
+			ppudata=Y=0xFE;
+		}else{
+			ppudata=Y=' ';
+		}
+	}
+	ppudata=Y=' ';
+	for (X=8;X;--X){		//check controller 2
+		if (A&in2){
+			ppudata=Y=0xFE;
+		}else{
+			ppudata=Y=' ';
+		}
+	}
+	ppuscroll=0,0;			//set position (0,0)
+	X=POP();
+	A=POP();
+}

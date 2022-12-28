@@ -1,1 +1,0 @@
-﻿#define szAbout L"dmc2bin v0.2 Alpha\r\nCopyright (C) 2017-2018 Yuri213212\r\n网址：https://github.com/Yuri213212/nsfaa\r\n邮箱：yuri213212@vip.qq.com\r\n使用协议：CC BY-NC-SA 4.0\r\nhttps://creativecommons.org/licenses/by-nc-sa/4.0/\r\n\r\n使用方法：拖拽.dmc文件到程序图标上来转换。"

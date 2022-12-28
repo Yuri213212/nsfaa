@@ -1,0 +1,31 @@
+\nes_mapper	0x14	;mapper020
+
+;;;;;;;;;;;;;;;;
+;	[FDS]
+;;;;;;;;;;;;;;;;
+@4020	:FDSLOCOUNTER	; W	;loCounter(8)
+@4021	:FDSHICOUNTER	; W	;hiCounter(8)
+@4022	:FDSIRQ		; W	;-,-,-,-,-,-,tIRQ,repeat
+@4023	:FDSSTATUS	; W	;-,-,-,-,-,-,sound,disk
+@4024	:FDSSOUT	; W	;data(8)
+@4025	:FDSSCTRL	; W	;sIRQ,start,1,CRC,mirrorH,R~W,reset,motor
+@4026	:FDSOUT		; W	;data(8)
+@4030	:FDSSSTATUS	;R 	;enable,end,-,CRC,-,-,bytedone,tIRQ
+@4031	:FDSSIN		;R 	;data(8)
+@4032	:FDSDISKSTATUS	;R 	;-,-,-,-,-,protect,~ready,~insert
+@4033	:FDSIN		;R 	;data(8)
+@4040	:W64OUT		;R 	;-,-,~data(6)
+	64:W64WAVE	; W	;64 byte data for wave table in -,-,~data(6)
+@4080	:W64VOL		; W	;~env,inc,vol(6)/envspeed(6)	;max vol=0x20
+@4082	:W64LOFREQ	; W	;loFreq(8)
+@4083	:W64HIFREQ	; W	;disable,~env,-,-,hiFreq(4)
+@4084	:WMODVOL	; W	;~env,inc,vol(6)/envspeed(6)
+@4085	:WMODDATA	; W	;-,data(7)			;signed,40~3F
+@4086	:WMODLOFREQ	; W	;loFreq(8)
+@4087	:WMODHIFREQ	; W	;disable,-,-,-,hiFreq(4)
+@4088	:WMODWAVE	; W*32	;-,-,-,-,-,data(3)
+@4089	:W64EN		; W	;wavewrite,-,-,-,-,-,gain(2) ;0=2/2, 1=2/3, 2=2/4, 3=2/5
+@408A	:W64ENVSPD	; W	;speed(8)
+@4090	:W64VOLR	;R 	;-,-,vol(6)
+@4091	:W64PHASER	;R 	;phase(8)			;useless in VirtuaNES
+@4092	:WMODVOLR	;R 	;-,-,vol(6)

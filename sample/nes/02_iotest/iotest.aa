@@ -1,0 +1,132 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nes	;file type: nes
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nes_mirror	1	;mirror flag, 0 for horizontal, 1 for vertical, 2 for 1-screen (some mapper only), 3 for 4-screen (some mapper only) (def=0)
+\nes_battery	0	;whether use battery-backed RAM (def=0)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[chr00]
+;;;;;;;;;;;;;;;;
+\bank CHR_8K
+@0000
+\include	?/include/CP437.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg00]
+;;;;;;;;;;;;;;;;
+\bank PRG_16K
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[ciram]
+;;;;;;;;;;;;;;;;
+@2020	:STATICSTART
+@2040	:DYNAMICSTART
+|4000
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[memory]
+;;;;;;;;;;;;;;;;
+@0200
+|0800
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+@C000
+:MESSAGE	'M '  'A 'B $0F $10 $18 $19 $1B $1A ' 'A 'B '- '- $18 $19 $1B $1A $00
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+:RESETHANDLER {
+	PUSH
+	TXA PUSH
+	LI $00 ST &PPUCTRL
+	ST &PPUMASK
+	BIT &PPUSTATUS
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	LADX ^NAME0 STX &PPUADDR LADX %NAME0 STX &PPUADDR
+	{ LIY #32 :_LOOP BZE !_BRK
+		{ LIX #32 :_LOOP BZE !_BRK
+			ST &PPUDATA
+		:_CON DECX JMP &_LOOP :_BRK }
+	:_CON DECY JMP &_LOOP :_BRK }
+	LADX ^PALETTEBG STX &PPUADDR LADX %PALETTEBG STX &PPUADDR
+	LI $2F ST &PPUDATA
+	LI $30 ST &PPUDATA
+	LADX ^STATICSTART STX &PPUADDR LADX %STATICSTART STX &PPUADDR
+	{ LIX $00 :_LOOP LD,X &MESSAGE BZE !_BRK
+		ST &PPUDATA
+	:_CON INCX JMP &_LOOP :_BRK }
+	LI #0 ST &PPUSCROLL ST &PPUSCROLL
+	LI $0A ST &PPUMASK
+	BIT &PPUSTATUS
+	LI $80 ST &PPUCTRL
+	{ :_LOOP JMP &_LOOP }
+	POP TAX
+	POP
+}
+
+:NMIHANDLER {
+	LADX ^DYNAMICSTART STX &PPUADDR LADX %DYNAMICSTART STX &PPUADDR
+	{ LD &IN1 ANDI $04 { BZE !_ELSE
+		LIY $FE STY &PPUDATA
+	JMP &_ENDIF :_ELSE }
+		LIY '  STY &PPUDATA
+	:_ENDIF }
+	LIY '  STY &PPUDATA
+	LI $01 ST &OUT LSRA ST &OUT
+	LI $01
+	{ LIX $08 :_LOOP BZE !_BRK
+		{ BIT &IN1 { BZE !_ELSE
+			LIY $FE STY &PPUDATA
+		JMP &_ENDIF :_ELSE }
+			LIY '  STY &PPUDATA
+		:_ENDIF }
+	:_CON DECX JMP &_LOOP :_BRK }
+	LIY '  STY &PPUDATA
+	{ LIX $08 :_LOOP BZE !_BRK
+		{ BIT &IN2 { BZE !_ELSE
+			LIY $FE STY &PPUDATA
+		JMP &_ENDIF :_ELSE }
+			LIY '  STY &PPUDATA
+		:_ENDIF }
+	:_CON DECX JMP &_LOOP :_BRK }
+	LI #0 ST &PPUSCROLL ST &PPUSCROLL
+RTI }
+
+:IRQHANDLER {
+RTI }
+
+;;;;;;;;;;;;;;;;
+;	[vector]
+;;;;;;;;;;;;;;;;
+|FFFA
+@FFFA
+&NMIHANDLER
+@FFFC
+&RESETHANDLER
+@FFFE
+&IRQHANDLER

@@ -1,1 +1,0 @@
-﻿#define szAbout L"nsfaa v0.2 Alpha\r\nCopyright (C) 2017-2018 Yuri213212\r\nウェブサイト：https://github.com/Yuri213212/nsfaa\r\nメール：yuri213212@vip.qq.com\r\nライセンス：CC BY-NC-SA 4.0\r\nhttps://creativecommons.org/licenses/by-nc-sa/4.0/\r\n\r\n使い方：コンパイルする.aaファイルをプログラムアイコンにドロップする。"

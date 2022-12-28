@@ -1,0 +1,199 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nes	;file type: nes
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nes_mirror	1	;mirror flag, 0 for horizontal, 1 for vertical, 2 for 1-screen (some mapper only), 3 for 4-screen (some mapper only) (def=0)
+\nes_battery	0	;whether use battery-backed RAM (def=0)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[chr00]
+;;;;;;;;;;;;;;;;
+\bank CHR_8K
+@0000
+\include	?/include/CP437.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg00]
+;;;;;;;;;;;;;;;;
+\bank PRG_16K
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+@02	:BUTTONWAIT
+
+;;;;;;;;;;;;;;;;
+;	[ciram]
+;;;;;;;;;;;;;;;;
+@2020	:STATICSTART
+@2028	:DYNAMICSTART
+|4000
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+1:WALLCLOCK
+1:CONTROLLER1 1:BUTTONWAITTO 1:BUTTONSAMPLE 1:BUTTONSTATE0 1:BUTTONSTATE1
+1:COUNT
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[memory]
+;;;;;;;;;;;;;;;;
+@0200
+|0800
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+@C000
+:HEX2C		"0123456789ABCDEF
+:MESSAGE	"count=0x $00
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+:RESETHANDLER {
+	LI $00 ST &PPUCTRL
+	ST &PPUMASK
+	BIT &PPUSTATUS
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	LADX %COUNT
+	{ :_LOOP
+		ST,X $00
+	:_CON DECX BNZ !_LOOP :_BRK }
+	{ :_LOOP BIT &PPUSTATUS BPZ !_LOOP }
+	LADX ^NAME0 STX &PPUADDR LADX %NAME0 STX &PPUADDR
+	{ LIY #32 :_LOOP BZE !_BRK
+		{ LIX #32 :_LOOP BZE !_BRK
+			ST &PPUDATA
+		:_CON DECX JMP &_LOOP :_BRK }
+	:_CON DECY JMP &_LOOP :_BRK }
+	LADX ^PALETTEBG STX &PPUADDR LADX %PALETTEBG STX &PPUADDR
+	LI $2F ST &PPUDATA
+	LI $30 ST &PPUDATA
+	LADX ^STATICSTART STX &PPUADDR LADX %STATICSTART STX &PPUADDR
+	{ LIX $00 :_LOOP LD,X &MESSAGE BZE !_BRK
+		ST &PPUDATA
+	:_CON INCX JMP &_LOOP :_BRK }
+	LI #0 ST &PPUSCROLL ST &PPUSCROLL
+	LI $0A ST &PPUMASK
+	BIT &PPUSTATUS
+	LI $80 ST &PPUCTRL
+	{ :_LOOP
+		LI $01 ST %CONTROLLER1
+		ST &OUT LSRA ST &OUT
+		{ :_LOOP
+			LD &IN1 LSRA RCL %CONTROLLER1
+		:_CON BCC !_LOOP :_BRK }
+		{ LD %BUTTONSTATE0 { BNZ !_ELSE
+			{ LD %BUTTONSTATE1 { BNZ !_ELSE
+				{ LD %CONTROLLER1 BZE !_ENDIF
+					ST %BUTTONSAMPLE
+					LI $80 ST %BUTTONSTATE0
+					LD %WALLCLOCK CLC ADCI %BUTTONWAIT ST %BUTTONWAITTO
+				:_ENDIF }
+			JMP &_ENDIF :_ELSE } LD %BUTTONSTATE1 AND %CONTROLLER1 BNZ !_ENDIF
+				ST %BUTTONSAMPLE
+				LI $80 ST %BUTTONSTATE0
+				LD %WALLCLOCK CLC ADCI %BUTTONWAIT ST %BUTTONWAITTO
+			:_ENDIF }
+		JMP &_ENDIF :_ELSE } LD %BUTTONWAITTO CLC SBC %WALLCLOCK { BMI !_ELSE
+			{ LD %BUTTONSAMPLE { BZE !_ELSE
+				{ AND %CONTROLLER1 { BZE !_ELSE
+					ST %BUTTONSAMPLE
+				JMP &_ENDIF :_ELSE }
+					ST %BUTTONSTATE0
+					ST %BUTTONSTATE1
+				:_ENDIF }
+			JMP &_ENDIF :_ELSE } LD %BUTTONSTATE1 AND %CONTROLLER1 BZE !_ENDIF
+				LI $00 ST %BUTTONSTATE0
+			:_ENDIF }
+		JMP &_ENDIF :_ELSE }
+			LD %BUTTONSAMPLE XORI $FF SEC ADCI $00 AND %BUTTONSAMPLE ST %BUTTONSAMPLE
+			{ CMPI %BTN_RIGHT BNE #3 JMP &_CASE_BTN_RIGHT CMPI %BTN_LEFT BNE #3 JMP &_CASE_BTN_LEFT CMPI %BTN_DOWN BNE #3 JMP &_CASE_BTN_DOWN CMPI %BTN_UP BNE #3 JMP &_CASE_BTN_UP CMPI %BTN_START BNE #3 JMP &_CASE_BTN_START CMPI %BTN_SELECT BNE #3 JMP &_CASE_BTN_SELECT CMPI %BTN_B BNE #3 JMP &_CASE_BTN_B CMPI %BTN_A BNE #3 JMP &_CASE_BTN_A BEQ #3 JMP &_DEF
+			:_CASE_BTN_RIGHT
+				INC %COUNT
+				JMP &_BRK
+			:_CASE_BTN_LEFT
+				DEC %COUNT
+				JMP &_BRK
+			:_CASE_BTN_DOWN
+				JMP &_BRK
+			:_CASE_BTN_UP
+				JMP &_BRK
+			:_CASE_BTN_START
+				JMP &_BRK
+			:_CASE_BTN_SELECT
+				JMP &_BRK
+			:_CASE_BTN_B
+				JMP &_BRK
+			:_CASE_BTN_A
+				JMP &_BRK
+			:_DEF
+				{ LD %BUTTONSTATE1 CMPI %BTN_RIGHT BNE #3 JMP &_CASE_BTN_RIGHT CMPI %BTN_LEFT BNE #3 JMP &_CASE_BTN_LEFT CMPI %BTN_DOWN BNE #3 JMP &_CASE_BTN_DOWN CMPI %BTN_UP BNE #3 JMP &_CASE_BTN_UP CMPI %BTN_START BNE #3 JMP &_CASE_BTN_START CMPI %BTN_SELECT BNE #3 JMP &_CASE_BTN_SELECT CMPI %BTN_B BNE #3 JMP &_CASE_BTN_B CMPI %BTN_A BNE #3 JMP &_CASE_BTN_A BEQ #3 JMP &_DEF
+				:_CASE_BTN_RIGHT
+					JMP &_BRK
+				:_CASE_BTN_LEFT
+					JMP &_BRK
+				:_CASE_BTN_DOWN
+					LD %COUNT SEC SBCI $10 ST %COUNT
+					JMP &_BRK
+				:_CASE_BTN_UP
+					LD %COUNT CLC ADCI $10 ST %COUNT
+					JMP &_BRK
+				:_CASE_BTN_START
+					JMP &_BRK
+				:_CASE_BTN_SELECT
+					JMP &_BRK
+				:_CASE_BTN_B
+					JMP &_BRK
+				:_CASE_BTN_A
+					JMP &_BRK
+				:_DEF
+
+				:_BRK }
+			:_BRK }
+			LI $00 ST %BUTTONSTATE0
+			LD %BUTTONSAMPLE ST %BUTTONSTATE1
+		:_ENDIF }
+	JMP &_LOOP }
+}
+
+:NMIHANDLER {
+	PUSH
+	TXA PUSH
+	LADX ^DYNAMICSTART STX &PPUADDR LADX %DYNAMICSTART STX &PPUADDR
+	LD %COUNT LSRA LSRA LSRA LSRA TAX LD,X &HEX2C ST &PPUDATA
+	LD %COUNT ANDI $0F TAX LD,X &HEX2C ST &PPUDATA
+	LI '  ST &PPUDATA LD %COUNT ST &PPUDATA
+	LI #0 ST &PPUSCROLL ST &PPUSCROLL
+	INC %WALLCLOCK
+	POP TAX
+	POP
+RTI }
+
+:IRQHANDLER {
+RTI }
+
+;;;;;;;;;;;;;;;;
+;	[vector]
+;;;;;;;;;;;;;;;;
+|FFFA
+@FFFA
+&NMIHANDLER
+@FFFC
+&RESETHANDLER
+@FFFE
+&IRQHANDLER

@@ -1,7 +1,0 @@
-[DPCM]
-Qxy	x=0,9~F,y=0~F	call $8800|$0xy0
-[FM]//auto reset on key with oct change, soft auto reset on key on following key off
-O00	force reset
-[FX]//no auto reset, soft auto reset on key on following key off
-O00	force reset
-GFF	force continue

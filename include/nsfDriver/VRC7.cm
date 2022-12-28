@@ -1,0 +1,37 @@
+//[fm1~9]		NR_V,N<-R,reset on stop
+fm1_S(){	//fm1 stop
+	vrc7.fm1freq=A=0x00;
+}//#no return
+
+fm1_F(A){	//fm1 fade, X=oct<<1
+	vrc7.fm1oct=A;
+}
+
+fm1_P(){	//fm1 pause
+	vrc7.fm1freq=0x00;
+}
+
+fm1_NRV(A,X){	//fm1 note and vol with reset, A=0,0,0,0,vol(4), X=note
+	vrc7.fm1vol=A;
+}//#no return
+
+fm1_NR(X){	//fm1 note with reset, X=note
+	vrc7.fm1oct=0x00;
+	vrc7.fm1freq=fmnote[X];
+	vrc7.fm1oct=fmoct[X];
+}
+
+fm1_NV(A,X){	//fm1 note and vol, A=0,0,0,0,vol(4), X=note
+	vrc7.fm1vol=A;
+}//#no return
+
+fm1_N(X){	//fm1 note, X=note
+	vrc7.fm1freq=fmnote[X];
+	vrc7.fm1oct=fmoct[X];
+}
+
+fm1_V(A){	//fm1 vol, A=0,0,0,0,vol(4)
+	vrc7.fm1vol=A;
+}
+
+//#same for fm2~9

@@ -1,0 +1,72 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nes	;file type: nes
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nes_mirror	1	;mirror flag, 0 for horizontal, 1 for vertical, 2 for 1-screen (some mapper only), 3 for 4-screen (some mapper only) (def=0)
+\nes_battery	0	;whether use battery-backed RAM (def=0)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg00]
+;;;;;;;;;;;;;;;;
+\bank PRG_16K
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[ciram]
+;;;;;;;;;;;;;;;;
+@2000
+|4000
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[memory]
+;;;;;;;;;;;;;;;;
+@0200
+|0800
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+@C000
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+:RESETHANDLER {
+	{ :_LOOP JMP &_LOOP }
+}
+
+:NMIHANDLER {
+RTI }
+
+:IRQHANDLER {
+RTI }
+
+;;;;;;;;;;;;;;;;
+;	[vector]
+;;;;;;;;;;;;;;;;
+|FFFA
+@FFFA
+&NMIHANDLER
+@FFFC
+&RESETHANDLER
+@FFFE
+&IRQHANDLER

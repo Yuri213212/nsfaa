@@ -1,0 +1,87 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		fds	;file type: fds
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+\include	?/include/mapper/FDS.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[side0]
+;;;;;;;;;;;;;;;;
+\fds_newside
+\fds_boottoid	0	;load to bank id on boot (def=bank count)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[0_kyodaku]
+;;;;;;;;;;;;;;;;
+\bank CI_2K
+\fds_bankid	0	;set id of current file (def=bank index)
+@2800
+\include	?/include/fdsKyodaku.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[1_prg]
+;;;;;;;;;;;;;;;;
+
+\bank FDS_64K
+\fds_bankid	0	;set id of current file (def=bank index)
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[ciram]
+;;;;;;;;;;;;;;;;
+@2000
+|4000
+
+;;;;;;;;;;;;;;;;
+;	[zeropage]
+;;;;;;;;;;;;;;;;
+@00
+|0100
+
+;;;;;;;;;;;;;;;;
+;	[memory]
+;;;;;;;;;;;;;;;;
+@0200
+|0800
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+@C000
+
+;;;;;;;;;;;;;;;;
+;	[code]
+;;;;;;;;;;;;;;;;
+:RESETHANDLER {
+	{ :_LOOP JMP &_LOOP }
+}
+
+:NMIHANDLER {
+RTI }
+
+:IRQHANDLER {
+RTI }
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[vector]
+;;;;;;;;;;;;;;;;
+|DFFA
+@DFFA
+&NMIHANDLER
+@DFFC
+&RESETHANDLER
+@DFFE
+&IRQHANDLER

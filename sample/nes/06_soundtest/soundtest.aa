@@ -1,0 +1,649 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[setting]
+;;;;;;;;;;;;;;;;
+\image		nes	;file type: nes
+\defnumlen	1	;default length of number (command $ and #) (def=1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[header]
+;;;;;;;;;;;;;;;;
+\nes_mirror	1	;mirror flag, 0 for horizontal, 1 for vertical, 2 for 1-screen (some mapper only), 3 for 4-screen (some mapper only) (def=0)
+\nes_battery	0	;whether use battery-backed RAM (def=0)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[library]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesSystem.ah
+\include	?/include/mapper/N163.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[chr00]
+;;;;;;;;;;;;;;;;
+\bank CHR_8K
+@0000
+\include	?/include/nesPlayer/chr.ah
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg00]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank00]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+@8000	;data
+LI #60 ST %TEMPODIV
+LAD %FXWAVEI ST &N163ADDR
+{ LIX $00 :_LOOP CPXI $40 BGE !_BRK
+	LD,X &FXINITDATA00 ST &N163DATA
+:_CON INCX JMP &_LOOP :_BRK }
+LAD %FX8VOLI ST &N163ADDR LI $70 ST &N163DATA
+LI #0 ST %TRANSPOSE
+LI '  ST %TEMPO0
+LI '6 ST %TEMPO1
+LI '0 ST %TEMPO2
+ST %TEMPO3
+ST %TEMPO4
+LI '  ST %SPEED0
+LI '1 ST %SPEED1
+LI '0 ST %MAXROW0
+ST %MAXROW1
+ST %MAXROW2
+LI '4 ST %MAXROW3
+CALL &ENDROW		;init
+
+{ LD %SONGNUM CMPI #1 BNE #3 JMP &_CASE1 CMPI #2 BNE #3 JMP &_CASE2 CMPI #3 BNE #3 JMP &_CASE3 CMPI #4 BNE #3 JMP &_CASE4 CMPI #5 BNE #3 JMP &_CASE5 CMPI #6 BNE #3 JMP &_CASE6 CMPI #7 BNE #3 JMP &_CASE7 CMPI #8 BNE #3 JMP &_CASE8 CMPI #9 BNE #3 JMP &_CASE9 CMPI #10 BNE #3 JMP &_CASE10 CMPI #11 BNE #3 JMP &_CASE11 CMPI #12 BNE #3 JMP &_CASE12 CMPI #13 BNE #3 JMP &_CASE13
+;default
+											LI $B8 CALL &REC1_IV	LI $B8 CALL &REC2_IV	LAD %FX1STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	LAD %FX2STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	LAD %FX3STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	LAD %FX4STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	LAD %FX5STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	LAD %FX6STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	LAD %FX7STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	LAD %FX8STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW
+	LIX $41 CALL &DPCM_NR	LI $06 LIX $38 CALL &NOISE_NIV	LIX #48 CALL &TRI_N	LIX #48 CALL &REC1_NR	LIX #48 CALL &REC2_NR	LAD %FX1LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX2LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX3LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX4LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX5LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX6LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX7LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX8LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW
+	CALL &DPCM_S		CALL &NOISE_M			CALL &TRI_P		CALL &REC1_S		CALL &REC2_S		LAD %FX1LOFREQI			CALL &FXA32_S				LAD %FX2LOFREQI			CALL &FXA32_S				LAD %FX3LOFREQI			CALL &FXA32_S				LAD %FX4LOFREQI			CALL &FXA32_S				LAD %FX5LOFREQI			CALL &FXA16_S				LAD %FX6LOFREQI			CALL &FXA16_S				LAD %FX7LOFREQI			CALL &FXA16_S				LAD %FX8LOFREQI			CALL &FXA16_S				CALL &ENDROW
+	LIX $41 CALL &DPCM_NR	LI $06 LIX $38 CALL &NOISE_NIV	LIX #48 CALL &TRI_N	LIX #48 CALL &REC1_NR	LIX #48 CALL &REC2_NR	LAD %FX1LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX2LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX3LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX4LOFREQI			LIX #71 CALL &FXA32_NR			LAD %FX5LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX6LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX7LOFREQI			LIX #59 CALL &FXA16_NR			LAD %FX8LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW
+	CALL &DPCM_S		CALL &NOISE_M			CALL &TRI_P		CALL &REC1_S		CALL &REC2_S		LAD %FX1LOFREQI			CALL &FXA32_S				LAD %FX2LOFREQI			CALL &FXA32_S				LAD %FX3LOFREQI			CALL &FXA32_S				LAD %FX4LOFREQI			CALL &FXA32_S				LAD %FX5LOFREQI			CALL &FXA16_S				LAD %FX6LOFREQI			CALL &FXA16_S				LAD %FX7LOFREQI			CALL &FXA16_S				LAD %FX8LOFREQI			CALL &FXA16_S				CALL &ENDSONG
+:_CASE1
+					CALL &ENDROW	;... ... ..
+	LIX $41 CALL &DPCM_NR		CALL &ENDROW	; 41 ... ..
+	CALL &DPCM_S			CALL &ENDROW	;--- ... ..
+	LIX $41 CALL &DPCM_NR		CALL &ENDROW	; 41 ... ..
+	CALL &DPCM_S			CALL &ENDSONG	;--- ... ..
+:_CASE2
+					CALL &ENDROW	;... ... ..
+	LI $06 LIX $38 CALL &NOISE_NIV	CALL &ENDROW	;A-4 ... ..
+	CALL &NOISE_M			CALL &ENDROW	;--- ... ..
+	LI $06 LIX $38 CALL &NOISE_NIV	CALL &ENDROW	;A-4 ... ..
+	CALL &NOISE_M			CALL &ENDSONG	;--- ... ..
+:_CASE3
+					CALL &ENDROW	;... ... ..
+	LIX #48 CALL &TRI_N		CALL &ENDROW	;A-3 ... ..
+	CALL &TRI_P			CALL &ENDROW	;--- ... ..
+	LIX #48 CALL &TRI_N		CALL &ENDROW	;A-3 ... ..
+	CALL &TRI_P			CALL &ENDSONG	;--- ... ..
+:_CASE4
+	LI $B8 CALL &REC1_IV		CALL &ENDROW	;... .02 40
+	LIX #48 CALL &REC1_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &REC1_S			CALL &ENDROW	;--- ... ..
+	LIX #48 CALL &REC1_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &REC1_S			CALL &ENDSONG	;--- ... ..
+:_CASE5
+	LI $B8 CALL &REC2_IV		CALL &ENDROW	;... .02 40
+	LIX #48 CALL &REC2_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &REC2_S			CALL &ENDROW	;--- ... ..
+	LIX #48 CALL &REC2_NR		CALL &ENDROW	;A-4 ... ..
+	CALL &REC2_S			CALL &ENDSONG	;--- ... ..
+:_CASE6
+	LAD %FX1STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .20 40
+	LAD %FX1LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX1LOFREQI			CALL &FXA32_S				CALL &ENDROW	;--- ... ..
+	LAD %FX1LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX1LOFREQI			CALL &FXA32_S				CALL &ENDSONG	;--- ... ..
+:_CASE7
+	LAD %FX2STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .20 40
+	LAD %FX2LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX2LOFREQI			CALL &FXA32_S				CALL &ENDROW	;--- ... ..
+	LAD %FX2LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX2LOFREQI			CALL &FXA32_S				CALL &ENDSONG	;--- ... ..
+:_CASE8
+	LAD %FX3STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .20 40
+	LAD %FX3LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX3LOFREQI			CALL &FXA32_S				CALL &ENDROW	;--- ... ..
+	LAD %FX3LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX3LOFREQI			CALL &FXA32_S				CALL &ENDSONG	;--- ... ..
+:_CASE9
+	LAD %FX4STARTI ST &N163ADDR	LI $20 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .20 40
+	LAD %FX4LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX4LOFREQI			CALL &FXA32_S				CALL &ENDROW	;--- ... ..
+	LAD %FX4LOFREQI			LIX #71 CALL &FXA32_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX4LOFREQI			CALL &FXA32_S				CALL &ENDSONG	;--- ... ..
+:_CASE10
+	LAD %FX5STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .28 40
+	LAD %FX5LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX5LOFREQI			CALL &FXA16_S				CALL &ENDROW	;--- ... ..
+	LAD %FX5LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX5LOFREQI			CALL &FXA16_S				CALL &ENDSONG	;--- ... ..
+:_CASE11
+	LAD %FX6STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .28 40
+	LAD %FX6LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX6LOFREQI			CALL &FXA16_S				CALL &ENDROW	;--- ... ..
+	LAD %FX6LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX6LOFREQI			CALL &FXA16_S				CALL &ENDSONG	;--- ... ..
+:_CASE12
+	LAD %FX7STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .28 40
+	LAD %FX7LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX7LOFREQI			CALL &FXA16_S				CALL &ENDROW	;--- ... ..
+	LAD %FX7LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX7LOFREQI			CALL &FXA16_S				CALL &ENDSONG	;--- ... ..
+:_CASE13
+	LAD %FX8STARTI ST &N163ADDR	LI $28 ST &N163DATA LI $78 ST &N163DATA	CALL &ENDROW	;... .28 40
+	LAD %FX8LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX8LOFREQI			CALL &FXA16_S				CALL &ENDROW	;--- ... ..
+	LAD %FX8LOFREQI			LIX #59 CALL &FXA16_NR			CALL &ENDROW	;A-4 ... ..
+	LAD %FX8LOFREQI			CALL &FXA16_S				CALL &ENDSONG	;--- ... ..
+:_BRK }
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+:FXINITDATA00
+	$10 $32 $54 $76 $98 $BA $DC $FE	;tri
+	$EF $CD $AB $89 $67 $45 $23 $01
+	$CC $CC $CC $CC $CC $CC $CC $CC	;rec parts
+	$00 $00 $00 $00 $00 $00 $00 $00	;rec parts
+	$A8 $DB $FE $FF	$FF $EF $BD $8A	;sin
+	$57 $24 $01 $00 $00 $10 $42 $75
+	$A8 $DB $FE $FF	$FF $EF $BD $8A	;sin
+	$57 $24 $01 $00 $00 $10 $42 $75
+
+|A000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank01]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+@C000	;dpcm
+\include	./dpcm.ah
+|E000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg01]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank02]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank03]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg02]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank04]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank05]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg03]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank06]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank07]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg04]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank08]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank09]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg05]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0A]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0B]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg06]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0C]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0D]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg07]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0E]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank0F]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg08]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank10]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank11]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg09]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank12]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank13]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0A]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank14]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank15]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0B]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank16]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank17]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0C]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank18]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank19]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0D]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1A]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1B]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0E]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1C]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1D]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg0F]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1E]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank1F]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg10]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank20]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank21]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg11]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank22]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank23]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg12]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank24]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank25]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg13]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank26]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank27]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg14]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank28]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank29]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg15]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2A]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2B]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg16]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2C]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2D]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg17]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2E]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank2F]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg18]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank30]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank31]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg19]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank32]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank33]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1A]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank34]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank35]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1B]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank36]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank37]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1C]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank38]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank39]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1D]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3A]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3B]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1E]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3C]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3D]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	2000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	[prg1F]
+;;;;;;;;;;;;;;;;
+\bank PRG-16K
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3E]
+;;;;;;;;;;;;;;;;
+\nes_bankoffset	0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;	[bank3F]
+;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;
+;	[definition]
+;;;;;;;;;;;;;;;;
+@0E	:SONGS
+
+;;;;;;;;;;;;;;;;
+;	[linked_code]
+;;;;;;;;;;;;;;;;
+\include	?/include/nesPlayer.ah
+\include	?/include/tuning/NES_A-4=440Hz.ah
+
+;;;;;;;;;;;;;;;;
+;	[const]
+;;;;;;;;;;;;;;;;
+~TITLE		"title
+~ARTIST		"artist
+~VERSION	"version
+~COMMENT	"comment
+~STARTBANK
+	$00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00

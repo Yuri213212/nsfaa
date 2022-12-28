@@ -1,0 +1,28 @@
+#define staticstart	0x2020		//CIRAM static contents start address
+
+const1 message[]="Hello world!";
+
+resetHandler(){
+	ppuctrl=A=0x00;			//disable PPU
+	ppumask=0x00;
+	ppustatus;			//acknowledgement
+	while (ppustatus>=0);		//wait for first vblank
+	while (ppustatus>=0);		//wait for second vblank
+	ppuaddr=name0;			//clear screen
+	A=0;
+	for (Y=32;Y;--Y){
+		for (X=32;X;--X){
+			ppudata=A;
+		}
+	}
+	ppuaddr=paletteBG;		//set BG palette
+	ppudata=0x2F;//black
+	ppudata=0x30;//white
+	ppuaddr=staticstart;		//print static contents
+	for (X=0;A=message[X];++X){
+		ppudata=A;
+	}
+	ppuscroll=0,0;			//set position (0,0)
+	ppumask=0x0A;			//enable PPU (BG only)
+	for (;;)
+}//#no return

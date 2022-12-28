@@ -1,0 +1,32 @@
+//[w64]			NR_V,N<-R,reset on stop
+w64_S(){	//w64 stop
+	w64hifreq=0xC0;
+}
+
+w64_P(){	//w64 pause
+	w64lofreq=0x00;
+	w64hifreq=0x40;
+}
+
+w64_NRV(A,X){	//w64 note and vol with reset, A=1,-,vol(6), X=note
+	w64vol=A;
+}//#no return
+
+w64_NR(X){	//w64 note with reset, X=note
+	w64hifreq=0xC0;
+	w64lofreq=w64notelo[X];
+	w64hifreq=w64notehi[X];
+}
+
+w64_NV(A,X){	//w64 note and vol, A=1,-,vol(6), X=note
+	w64vol=A;
+}//#no return
+
+w64_N(X){	//w64 note, X=note
+	w64lofreq=w64notelo[X];
+	w64hifreq=w64notehi[X];
+}
+
+w64_V(A){	//w64 vol, A=1,-,vol(6)
+	w64vol=A;
+}
